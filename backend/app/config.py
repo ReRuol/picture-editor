@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev-only-secret-please-change-in-production"
     jwt_ttl_hours: int = 24
 
-    # image provider: mock | dashscope
+    # image provider: mock | dashscope | volcengine
     image_provider: str = "mock"
     dashscope_api_key: str = ""
     # 业务空间专属域名为 https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com
@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     text_to_image_model: str = "qwen-image-3.0-pro"
     image_edit_model: str = "qwen-image-edit-max"
     planner_model: str = "qwen-plus"
+    # 规划模型平台：dashscope | volcengine，与 image_provider 相互独立
+    planner_provider: str = "dashscope"
+    # 火山引擎方舟；模型名也可填控制台创建的推理接入点 ID（ep-xxx）
+    volcengine_api_key: str = ""
+    volcengine_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
+    volcengine_image_model: str = "doubao-seedream-4-0-250828"
+    volcengine_planner_model: str = "doubao-seed-1-6-250615"
     # auto：有 rembg 用 rembg，否则四角抠图；测试强制 corner 以免下载模型
     matting_provider: str = "auto"
     # auto：有 rapidocr 则识别文字层；none 跳过；测试强制 none
