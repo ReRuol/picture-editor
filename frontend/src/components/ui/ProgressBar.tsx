@@ -7,7 +7,7 @@ export default function ProgressBar({
   className = 'h-0.5',
 }: {
   value: number
-  tone?: 'ink' | 'brand'
+  tone?: 'ink' | 'brand' | 'accent'
   className?: string
 }) {
   const clamped = Math.max(0, Math.min(100, value))
@@ -21,7 +21,7 @@ export default function ProgressBar({
       className={`bg-line overflow-hidden ${className}`}
     >
       <div
-        className={`h-full ${tone === 'brand' ? 'bg-brand-strong' : 'bg-ink'}`}
+        className={`h-full ${tone === 'brand' ? 'bg-brand' : tone === 'accent' ? 'bg-accent' : 'bg-ink'}`}
         style={{ width: `${Math.max(clamped, 2)}%` }}
       />
     </div>

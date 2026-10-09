@@ -52,7 +52,7 @@ export default function AgentConversation({ sessionId }: { sessionId: string }) 
 function TurnBlock({ turn, sessionId }: { turn: Turn; sessionId: string }) {
   return (
     <div className="space-y-2">
-      <p className="bg-brand-soft text-brand-strong ml-6 rounded-[12px] px-3 py-2 text-xs leading-relaxed">
+      <p className="bg-brand-soft text-brand-strong ml-6 rounded-control px-3 py-2 text-xs leading-relaxed">
         {turn.goal}
       </p>
 
@@ -147,7 +147,7 @@ function StepCard({
   }, [status, sessionId, queryClient])
 
   return (
-    <div className="border-line mr-6 rounded-[12px] border px-3 py-2">
+    <div className="border-line mr-6 rounded-control border px-3 py-2">
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-ink text-xs font-medium">
           {index}. {step.label}
@@ -159,7 +159,7 @@ function StepCard({
 
       {running && (
         <>
-          <ProgressBar value={progress} className="mt-2 h-0.5 rounded-full" />
+          <ProgressBar value={progress} tone="accent" className="mt-2 h-[3px]" />
           <p className="text-faint mt-1.5 text-[10px]">{stage}</p>
         </>
       )}

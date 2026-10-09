@@ -40,7 +40,7 @@ export default function ImageDropzone({ onFile, disabled, hint, multiple }: Prop
           if (multiple) files.forEach((file) => accept(file))
           else accept(files[0])
         }}
-        className={`flex w-full flex-col items-center gap-1.5 rounded-[18px] border border-dashed px-6 py-10 transition-colors disabled:opacity-50 ${
+        className={`flex w-full flex-col items-center gap-1.5 rounded-card border border-dashed px-6 py-10 transition-colors disabled:opacity-50 ${
           dragging ? 'border-brand bg-brand-soft' : 'border-line-strong bg-paper hover:border-brand'
         }`}
       >

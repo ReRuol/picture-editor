@@ -1,8 +1,9 @@
 export type ButtonVariant = 'ghost' | 'solid' | 'outline' | 'icon'
 export type ButtonSize = 'sm' | 'md'
 
+// 按下时整块往阴影方向落 1px，像压在纸上；禁用时去掉套印阴影，只留淡色油墨
 const BASE =
-  'relative overflow-hidden font-medium transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100'
+  'relative overflow-hidden font-medium transition-[background-color,color,border-color,box-shadow,translate] duration-150 active:translate-x-px active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none disabled:active:translate-none'
 
 const SHAPE: Record<ButtonSize, string> = {
   sm: 'rounded-chip px-2 py-1 text-[11px]',
@@ -11,21 +12,22 @@ const SHAPE: Record<ButtonSize, string> = {
 
 const ICON_SHAPE: Record<ButtonSize, string> = {
   sm: 'rounded-chip grid size-7 place-items-center text-sm',
-  md: 'rounded-chip grid size-8 place-items-center text-sm',
+  md: 'rounded-control grid size-8 place-items-center text-sm',
 }
 
 const IDLE: Record<ButtonVariant, string> = {
   ghost: 'text-muted hover:bg-soft hover:text-ink',
-  solid: 'bg-ink hover:bg-dark text-white',
-  outline: 'border-line text-muted hover:bg-soft hover:text-ink border',
+  solid: 'bg-brand text-paper shadow-print hover:bg-brand-strong',
+  outline: 'border-line text-ink hover:border-brand hover:text-brand border bg-paper',
   icon: 'text-muted hover:bg-soft hover:text-ink',
 }
 
+// 选中一律是实心蓝油墨，全站只有这一种选中态
 const ON: Record<ButtonVariant, string> = {
-  ghost: 'bg-brand-soft text-brand-strong',
-  solid: 'bg-dark text-white',
-  outline: 'border-brand bg-brand-soft text-brand-strong border',
-  icon: 'bg-brand-soft text-brand-strong',
+  ghost: 'bg-brand text-paper',
+  solid: 'bg-brand-strong text-paper shadow-print',
+  outline: 'border-brand bg-brand text-paper border',
+  icon: 'bg-brand text-paper',
 }
 
 export type ButtonLook = {

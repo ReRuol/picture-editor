@@ -43,14 +43,14 @@ function LibraryGroupCard({
   }
 
   return (
-    <li className="border-line bg-paper overflow-hidden rounded-[18px] border">
+    <li className="border-line bg-paper overflow-hidden rounded-card border">
       <div className="flex items-stretch">
         <button
           type="button"
           onClick={openGroup}
           className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left"
         >
-          <span className="bg-canvas border-line size-14 shrink-0 overflow-hidden rounded-[10px] border">
+          <span className="bg-canvas border-line size-14 shrink-0 overflow-hidden rounded-control border">
             <img src={group.cover.url} alt="" className="size-full object-cover" />
           </span>
           <span className="min-w-0 flex-1">

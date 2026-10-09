@@ -11,7 +11,7 @@ export default function DeliverySteps() {
       <ol className="border-line bg-paper rounded-card divide-line grid divide-y border sm:grid-cols-4 sm:divide-x sm:divide-y-0">
         {STEPS.map((step, index) => (
           <li key={step.title} className="p-6">
-            <span className="bg-brand-soft text-brand-strong grid size-7 place-items-center rounded-full text-xs font-semibold">
+            <span className="bg-brand text-paper shadow-print rounded-chip font-mono grid size-7 place-items-center text-xs font-semibold">
               {index + 1}
             </span>
             <h3 className="text-ink mt-4 text-sm font-medium">{step.title}</h3>

@@ -78,12 +78,12 @@ function Compose() {
                 <img
                   src={asset.url}
                   alt=""
-                  className="border-line size-16 rounded-[10px] border object-cover"
+                  className="border-line size-16 rounded-control border object-cover"
                 />
                 <button
                   type="button"
                   onClick={() => setAssets((current) => current.filter((item) => item.id !== asset.id))}
-                  className="bg-ink/70 absolute -top-1 -right-1 grid size-5 place-items-center rounded-full text-[10px] text-white"
+                  className="bg-ink/70 absolute -top-1 -right-1 rounded-chip grid size-5 place-items-center text-[10px] text-white"
                   aria-label="移除"
                 >
                   ×
@@ -102,7 +102,7 @@ function Compose() {
                     <img
                       src={asset.url}
                       alt=""
-                      className="border-line size-14 rounded-[10px] border object-cover hover:border-brand"
+                      className="border-line size-14 rounded-control border object-cover hover:border-brand"
                     />
                   </button>
                 </li>
@@ -135,7 +135,7 @@ function Compose() {
               <li key={item.run.id}>
                 <Link
                   to={`/batch/${item.run.id}`}
-                  className="border-line bg-paper hover:border-brand flex items-center justify-between rounded-[14px] border px-4 py-3"
+                  className="border-line bg-paper hover:border-brand flex items-center justify-between rounded-control border px-4 py-3"
                 >
                   <span className="text-ink text-sm">
                     {item.items.length} 张 · {item.run.stage || item.run.status}
@@ -193,7 +193,7 @@ function Watch({ runId }: { runId: string }) {
             {done ? '' : ` · ${live.progress}%`}
           </p>
           {!done && (
-            <ProgressBar value={live.progress} className="mt-2 h-0.5 w-64 rounded-full" />
+            <ProgressBar value={live.progress} tone="accent" className="mt-2 h-[3px] w-64" />
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -221,12 +221,12 @@ function Watch({ runId }: { runId: string }) {
         {(data?.items ?? []).map((item) => (
           <li
             key={item.source.id}
-            className="border-line bg-paper flex items-center gap-4 rounded-[16px] border p-3"
+            className="border-line bg-paper flex items-center gap-4 rounded-card border p-3"
           >
             <img
               src={item.source.url}
               alt=""
-              className="bg-canvas size-16 shrink-0 rounded-[10px] object-contain"
+              className="bg-canvas size-16 shrink-0 rounded-control object-contain"
             />
             <div className="min-w-0 flex-1">
               <p className="text-ink text-sm">{statusLabel(item.status)}</p>
@@ -242,7 +242,7 @@ function Watch({ runId }: { runId: string }) {
                   key={output.id}
                   src={output.url}
                   alt=""
-                  className="border-line size-12 rounded-[8px] border object-cover"
+                  className="border-line size-12 rounded-control border object-cover"
                 />
               ))}
             </div>
@@ -288,7 +288,7 @@ function Pipeline({
         {BATCH_STEPS.map((step) => {
           const on = draft.selected.includes(step.id)
           return (
-            <li key={step.id} className="border-line bg-paper rounded-[16px] border p-4">
+            <li key={step.id} className="border-line bg-paper rounded-card border p-4">
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
@@ -306,7 +306,7 @@ function Pipeline({
                   value={draft.prompt}
                   onChange={(event) => onChange({ ...draft, prompt: event.target.value })}
                   placeholder="例如：浅木色桌面，晨光"
-                  className="border-line mt-3 w-full rounded-[10px] border px-3 py-2 text-xs outline-none"
+                  className="border-line mt-3 w-full rounded-control border px-3 py-2 text-xs outline-none"
                 />
               )}
               {on && step.id === 'adjust_image' && (

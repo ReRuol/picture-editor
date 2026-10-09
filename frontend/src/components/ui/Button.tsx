@@ -50,7 +50,7 @@ export default function Button({
       )}
       {running && (
         <span
-          className="bg-brand-strong/60 absolute bottom-0 left-0 h-[2px]"
+          className="bg-accent absolute bottom-0 left-0 h-[3px]"
           style={{ width: `${Math.max(filled, 4)}%` }}
         />
       )}

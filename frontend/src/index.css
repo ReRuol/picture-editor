@@ -1,36 +1,52 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource/dm-serif-display';
+@import '@fontsource/space-mono';
 
+/*
+ * Riso 孔版印刷：纸底 + 两种专色油墨。
+ * 蓝 = 操作（主按钮、选中、当前工具）；粉 = AI 与需要注意的地方（生成中、选区、提示）。
+ * 阴影一律是错位的硬色块，模拟套印偏移，不用模糊阴影。
+ */
 @theme {
   --font-sans:
-    system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    'Space Grotesk Variable', system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  --font-display: 'DM Serif Display', 'Songti SC', 'STSong', 'Noto Serif SC', serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --color-ink: #171917;
-  --color-muted: #6f746f;
-  --color-faint: #9aa09a;
-  --color-line: #e5e8e4;
-  --color-line-strong: #d7dbd6;
-  --color-paper: #ffffff;
-  --color-canvas: #eff1ee;
-  --color-soft: #f6f7f5;
-  --color-dark: #1e211e;
+  --color-ink: #13294b;
+  --color-muted: #4d6280;
+  --color-faint: #75849b;
+  --color-line: #dcd5c5;
+  --color-line-strong: #b9b09c;
+  --color-paper: #fbf9f4;
+  --color-canvas: #f3efe6;
+  --color-soft: #ebe5d7;
+  --color-dark: #0a1c36;
+  /* 修图画布必须无彩色，否则用户判断不准调色和换背景的效果 */
+  --color-stage: #e6e6e6;
 
-  --color-brand: #5f98ad;
-  --color-brand-strong: #427f95;
-  --color-brand-soft: #e8f2f5;
-  --color-accent: #d9ff6e;
+  --color-brand: #0078bf;
+  --color-brand-strong: #005e96;
+  --color-brand-soft: #dcebf5;
+  --color-accent: #ff48b0;
+  --color-accent-strong: #d42a8c;
+  --color-accent-soft: #ffe0f0;
 
-  --color-danger: #d95656;
-  --color-success: #3b8a61;
+  --color-danger: #d7372a;
+  --color-success: #00875a;
 
-  --radius-chip: 8px;
-  --radius-card: 18px;
-  --radius-control: 12px;
-  --radius-panel: 26px;
+  --radius-chip: 2px;
+  --radius-card: 4px;
+  --radius-control: 3px;
+  --radius-panel: 4px;
 
-  --shadow-card: 0 16px 42px rgb(25 31 26 / 0.09);
-  --shadow-control: 0 8px 22px rgb(27 31 27 / 0.08);
-  --shadow-lift: 0 20px 46px -18px rgb(20 26 20 / 0.18);
-  --shadow-panel: 0 28px 72px -26px rgb(20 26 20 / 0.3);
+  --shadow-card: 6px 6px 0 rgb(255 72 176 / 0.28);
+  --shadow-control: 2px 2px 0 rgb(0 120 191 / 0.22);
+  --shadow-lift: 4px 4px 0 rgb(255 72 176 / 0.38);
+  --shadow-panel: 6px 6px 0 rgb(0 120 191 / 0.16);
+  --shadow-print: 3px 3px 0 rgb(255 72 176 / 0.6);
 
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -112,36 +128,46 @@
   }
 
   body {
-    @apply bg-canvas text-ink font-sans antialiased;
+    @apply bg-canvas text-ink bg-grain font-sans antialiased;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
   }
 
   :focus-visible {
     @apply outline-brand outline-2 outline-offset-2;
   }
 
-  /* 滑杆是修图里最高频的控件，统一做成跟手的细轨道加浮起滑块 */
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: var(--color-brand);
+  }
+
+  /* 滑杆：细线轨道 + 方形油墨滑块，按下时套印一层粉 */
   input[type='range'] {
     @apply h-4 w-full cursor-pointer appearance-none bg-transparent;
   }
 
   input[type='range']::-webkit-slider-runnable-track {
-    @apply bg-line h-1 rounded-full;
+    @apply bg-line-strong h-[3px];
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply bg-paper border-line-strong shadow-control -mt-1.5 size-4 appearance-none rounded-full border;
+    @apply bg-brand border-paper -mt-[5.5px] size-3.5 appearance-none border-2;
     transition:
       transform 0.15s var(--ease-soft),
-      border-color 0.15s var(--ease-soft),
-      background-color 0.15s var(--ease-soft);
+      box-shadow 0.15s var(--ease-soft);
   }
 
   input[type='range']:hover::-webkit-slider-thumb {
-    @apply border-brand scale-110;
+    box-shadow: 2px 2px 0 rgb(255 72 176 / 0.6);
   }
 
   input[type='range']:active::-webkit-slider-thumb {
-    @apply border-brand bg-brand-soft scale-95;
+    @apply scale-110;
+    box-shadow: 3px 3px 0 rgb(255 72 176 / 0.75);
   }
 
   input[type='range']:disabled {
@@ -149,11 +175,11 @@
   }
 
   input[type='range']::-moz-range-track {
-    @apply bg-line h-1 rounded-full;
+    @apply bg-line-strong h-[3px];
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply bg-paper border-line-strong size-4 appearance-none rounded-full border;
+    @apply bg-brand border-paper size-3.5 appearance-none rounded-none border-2;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -179,7 +205,6 @@
   &::-webkit-scrollbar-thumb {
     background-color: var(--color-line-strong);
     border: 2px solid transparent;
-    border-radius: 999px;
     background-clip: content-box;
   }
 
@@ -188,18 +213,32 @@
   }
 }
 
-/* 首屏顶部的光晕，为居中的输入面板提供视觉重心 */
-@utility bg-glow {
-  background:
-    radial-gradient(62% 52% at 50% -6%, rgb(232 242 245 / 0.95), transparent 72%),
-    radial-gradient(34% 34% at 84% 6%, rgb(217 255 110 / 0.28), transparent 70%);
+/* 纸张颗粒：两层错开的细点，模拟孔版纸的纤维感 */
+@utility bg-grain {
+  background-image:
+    radial-gradient(rgb(19 41 75 / 0.07) 1px, transparent 1.2px),
+    radial-gradient(rgb(19 41 75 / 0.04) 1px, transparent 1.2px);
+  background-size:
+    5px 5px,
+    3px 3px;
+  background-position:
+    0 0,
+    1px 2px;
 }
 
-/* 网格底纹，向下淡出以免干扰正文 */
-@utility bg-grid {
-  background-image:
-    linear-gradient(to right, rgb(23 25 23 / 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(23 25 23 / 0.05) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(68% 58% at 50% 0%, #000 10%, transparent 100%);
+/* 半调网点，颜色取 currentColor，可做生成中、占位、装饰色块 */
+@utility bg-halftone {
+  background-image: radial-gradient(currentColor 34%, transparent 38%);
+  background-size: 7px 7px;
+}
+
+/* 套印错版：蓝字下错开一层粉，用在大标题和强调数字 */
+@utility text-print {
+  color: var(--color-brand);
+  text-shadow: 0.05em 0.035em 0 rgb(255 72 176 / 0.62);
+}
+
+/* 粉色荧光笔：标题里需要强调的词 */
+@utility mark-print {
+  background: linear-gradient(transparent 58%, rgb(255 72 176 / 0.35) 58%, rgb(255 72 176 / 0.35) 92%, transparent 92%);
 }

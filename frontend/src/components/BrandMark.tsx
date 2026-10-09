@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 
 const GLYPH_SIZE = {
-  sm: 'size-6 rounded-[7px]',
-  md: 'size-8 rounded-[10px]',
+  sm: 'size-6 rounded-chip',
+  md: 'size-8 rounded-chip',
 } as const
 
-/** 品牌标识：ink 底 + accent 图层符号，落地页、登录页与工作台共用一处。 */
+/** 品牌标识：蓝油墨方块 + 粉色套印偏移，落地页、登录页与工作台共用一处。 */
 export default function BrandMark({
   size = 'md',
   className = '',
@@ -18,7 +18,7 @@ export default function BrandMark({
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <span
-        className={`bg-ink text-accent grid shrink-0 place-items-center ${GLYPH_SIZE[size]}`}
+        className={`bg-brand text-paper shadow-print grid shrink-0 place-items-center ${GLYPH_SIZE[size]}`}
         aria-hidden
       >
         <svg viewBox="0 0 24 24" fill="none" className="size-[62%]">

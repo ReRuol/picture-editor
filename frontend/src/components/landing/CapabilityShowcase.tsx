@@ -44,7 +44,7 @@ export default function CapabilityShowcase() {
             key={item.title}
             className="border-line bg-paper rounded-card hover:shadow-lift border p-6 transition-shadow"
           >
-            <div className="bg-soft border-line/70 mb-6 flex h-44 items-center justify-center overflow-hidden rounded-[14px] border px-5 py-4">
+            <div className="bg-soft border-line/70 mb-6 flex h-44 items-center justify-center overflow-hidden rounded-control border px-5 py-4">
               {item.preview}
             </div>
             <h3 className="text-ink font-medium">{item.title}</h3>

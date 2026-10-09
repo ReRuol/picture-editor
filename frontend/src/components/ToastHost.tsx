@@ -11,10 +11,10 @@ export default function ToastHost() {
       {items.map((item) => (
         <div
           key={item.id}
-          className={`shadow-control pointer-events-auto flex items-center gap-1.5 rounded-full text-xs font-medium ${
+          className={`shadow-print rounded-control pointer-events-auto flex items-center gap-1.5 text-xs font-medium ${
             item.action ? 'py-1 pr-1 pl-3.5' : 'px-3.5 py-1.5'
           } ${item.leaving ? 'animate-fade-out' : 'animate-pop'} ${
-            item.tone === 'danger' ? 'bg-danger text-white' : 'bg-ink text-white'
+            item.tone === 'danger' ? 'bg-danger text-paper' : 'bg-ink text-paper'
           }`}
         >
           <button type="button" onClick={() => dismiss(item.id)} className="text-left">
@@ -27,7 +27,7 @@ export default function ToastHost() {
                 item.action?.run()
                 dismiss(item.id)
               }}
-              className="rounded-full bg-white/15 px-2.5 py-1 transition-all duration-150 hover:bg-white/25 active:scale-[0.97]"
+              className="bg-accent text-ink rounded-chip px-2.5 py-1 font-semibold transition-colors duration-150 hover:bg-accent-soft active:translate-px"
             >
               {item.action.label}
             </button>

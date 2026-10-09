@@ -45,7 +45,7 @@ export default function WorkbenchLayout() {
                   to={item.to}
                   title={item.label}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-sm transition-colors ${
+                    `flex items-center gap-3 rounded-control px-3 py-2.5 text-sm transition-colors ${
                       isActive
                         ? 'bg-brand-soft text-brand-strong font-medium'
                         : 'text-muted hover:bg-soft hover:text-ink'
@@ -66,9 +66,9 @@ export default function WorkbenchLayout() {
               type="button"
               onClick={signOut}
               title={user ? `${user.username} · 退出登录` : '退出登录'}
-              className="text-muted hover:bg-soft hover:text-ink flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-sm transition-colors"
+              className="text-muted hover:bg-soft hover:text-ink flex w-full items-center gap-3 rounded-control px-3 py-2.5 text-sm transition-colors"
             >
-              <span className="bg-brand-soft text-brand-strong grid size-5 shrink-0 place-items-center rounded-full text-[11px] font-semibold">
+              <span className="bg-accent text-ink rounded-chip grid size-5 shrink-0 place-items-center text-[11px] font-semibold">
                 {user?.username.slice(0, 1).toUpperCase() ?? '?'}
               </span>
               <span className="truncate opacity-0 transition-opacity group-hover:opacity-100">

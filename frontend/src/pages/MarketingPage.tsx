@@ -137,8 +137,8 @@ function Workspace({ sessionId }: { sessionId: string }) {
         }
       />
 
-      <section className="border-line bg-paper mb-8 flex items-center gap-4 rounded-[18px] border p-4">
-        <div className="bg-canvas border-line size-20 shrink-0 overflow-hidden rounded-[12px] border">
+      <section className="border-line bg-paper mb-8 flex items-center gap-4 rounded-card border p-4">
+        <div className="bg-canvas border-line size-20 shrink-0 overflow-hidden rounded-control border">
           {current && <img src={current.url} alt="" className="size-full object-contain" />}
         </div>
         <div className="min-w-0 flex-1">
@@ -221,8 +221,8 @@ function Workspace({ sessionId }: { sessionId: string }) {
             {tools.pending && (
               <ProgressBar
                 value={tools.pendingProgress}
-                tone="brand"
-                className="mt-1.5 h-0.5 w-48 rounded-full"
+                tone="accent"
+                className="mt-1.5 h-[3px] w-48"
               />
             )}
           </div>
@@ -301,7 +301,7 @@ function KindCard({
   onGenerate: () => void
 }) {
   return (
-    <div className="border-line bg-paper flex flex-col rounded-[16px] border p-4">
+    <div className="border-line bg-paper flex flex-col rounded-card border p-4">
       <p className="text-ink text-sm font-medium">{label}</p>
       <p className="text-faint mt-1 min-h-8 flex-1 text-xs leading-relaxed">{hint}</p>
       <button
@@ -377,7 +377,7 @@ function PackList({
                   type="button"
                   onClick={() => onToggle(asset.id)}
                   aria-pressed={active}
-                  className={`w-full overflow-hidden rounded-[16px] border-2 text-left transition-colors ${
+                  className={`w-full overflow-hidden rounded-card border-2 text-left transition-colors ${
                     active
                       ? 'border-brand bg-brand-soft shadow-control'
                       : 'border-line bg-paper hover:border-brand'
@@ -386,7 +386,7 @@ function PackList({
                   <div className="bg-canvas relative aspect-square">
                     <img src={asset.url} alt="" className="size-full object-contain" />
                     <span
-                      className={`absolute top-2 left-2 grid size-6 place-items-center rounded-full border-2 ${
+                      className={`absolute top-2 left-2 rounded-chip grid size-6 place-items-center border-2 ${
                         active
                           ? 'border-brand bg-brand text-white'
                           : 'border-white/90 bg-ink/35 text-white/0'

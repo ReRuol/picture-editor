@@ -108,11 +108,11 @@ function Candidate({
         loading="lazy"
         className="block max-h-[52vh] w-full object-contain transition-transform duration-300 group-hover:scale-[1.01]"
       />
-      <span className="text-muted bg-paper/90 absolute top-2 left-2 rounded-full px-2 py-0.5 text-xs font-medium backdrop-blur">
+      <span className="text-muted bg-paper/90 absolute top-2 left-2 rounded-chip px-2 py-0.5 text-xs font-medium backdrop-blur">
         {index + 1}
       </span>
       {selected && (
-        <span className="bg-brand absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-medium text-white">
+        <span className="bg-brand shadow-print absolute top-2 right-2 rounded-chip px-2 py-0.5 text-xs font-medium text-white">
           已选
         </span>
       )}
@@ -123,7 +123,7 @@ function Candidate({
 function Progress({ percent, stage }: { percent: number; stage: string }) {
   return (
     <Centered title="正在生成" hint={stage || '任务已提交，正在排队'}>
-      <ProgressBar value={percent} className="mt-6 h-1 w-64 rounded-full" />
+      <ProgressBar value={percent} tone="accent" className="mt-6 h-1 w-64" />
       <p className="text-faint mt-2 text-xs tabular-nums">{percent}%</p>
     </Centered>
   )

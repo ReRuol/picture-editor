@@ -52,10 +52,10 @@ export default function LandingHero({
       {/* 容器给到 4xl，让 14 字标题在桌面端稳定单行；正文与输入框各自再收窄 */}
       <div className="relative mx-auto max-w-4xl px-6 pt-16 pb-14 text-center sm:pt-24">
         <p
-          className="border-line bg-paper/80 text-muted animate-rise inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs backdrop-blur"
+          className="border-line bg-paper/80 text-muted animate-rise rounded-chip inline-flex items-center gap-2 border px-3.5 py-1.5 text-xs backdrop-blur"
           style={{ animationDelay: '40ms' }}
         >
-          <span className="bg-accent size-1.5 rounded-full" aria-hidden />
+          <span className="bg-accent size-1.5" aria-hidden />
           面向电商运营与内容创作者
         </p>
 
@@ -67,7 +67,7 @@ export default function LandingHero({
           <span className="relative mx-1 whitespace-nowrap">
             {/* CJK 字身占满字框，高亮块需覆盖整个字高才像马克笔而非删除线 */}
             <span
-              className="bg-accent/55 absolute inset-x-[-7px] top-[14%] bottom-[8%] -skew-x-6 rounded-[3px]"
+              className="bg-accent/55 absolute inset-x-[-7px] top-[14%] bottom-[8%] -skew-x-6 rounded-chip"
               aria-hidden
             />
             <span className="relative">可上架</span>
@@ -103,7 +103,7 @@ export default function LandingHero({
               key={scenario.label}
               type="button"
               onClick={() => pick(scenario.prompt)}
-              className="border-line bg-paper/70 text-muted hover:border-brand hover:text-brand-strong rounded-full border px-3.5 py-1.5 text-xs transition-colors"
+              className="border-line bg-paper/70 text-muted hover:border-brand hover:text-brand-strong rounded-chip border px-3.5 py-1.5 text-xs transition-colors"
             >
               {scenario.label}
             </button>
