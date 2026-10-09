@@ -45,9 +45,6 @@ class Settings(BaseSettings):
     volcengine_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
     volcengine_image_model: str = "doubao-seedream-4-0-250828"
     volcengine_planner_model: str = "doubao-seed-1-6-250615"
-    # 画幅像素上下限，0 表示按模型 ID 自动取；用接入点 ID（ep-xxx）时需要手填
-    volcengine_min_pixels: int = 0
-    volcengine_max_pixels: int = 0
     # DeepSeek 官方接口，只做规划（纯文本 + 工具调用）
     deepseek_api_key: str = ""
     deepseek_base_url: str = "https://api.deepseek.com"
