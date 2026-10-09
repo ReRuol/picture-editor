@@ -12,6 +12,7 @@ import {
 } from 'react-konva'
 
 import type { Layer, LayerDocument } from '@/api/sessions'
+import OffscreenFinder from '@/components/editor/OffscreenFinder'
 import { SelectionOverlay } from '@/components/editor/SelectionOverlay'
 import { canvasStamp, useHeldCanvas, type HeldCanvas } from '@/hooks/useHeldCanvas'
 import { usePointPreview } from '@/hooks/usePointPreview'
@@ -281,6 +282,12 @@ export default function CanvasStage({
           />
         )}
       </Stage>
+      <OffscreenFinder
+        canvas={canvas}
+        view={{ scale, x, y }}
+        viewport={size}
+        onFind={() => fit(canvas)}
+      />
       {editing && (
         <TextEditor
           layer={editing}
