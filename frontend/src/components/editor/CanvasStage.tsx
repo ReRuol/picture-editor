@@ -244,7 +244,6 @@ export default function CanvasStage({
             layerPreview={layerPreview}
             interactive={interactive}
             stageDraggable={stageDraggable}
-            viewScale={scale}
             selectedId={selectedLayerId}
             editingId={editingId}
             onSelect={selectLayer}
@@ -406,7 +405,6 @@ function DocumentLayer({
   clip,
   interactive = false,
   stageDraggable = false,
-  viewScale = 1,
   selectedId = null,
   editingId = null,
   onSelect,
@@ -422,7 +420,6 @@ function DocumentLayer({
   clip?: { x: number; y: number; width: number; height: number }
   interactive?: boolean
   stageDraggable?: boolean
-  viewScale?: number
   selectedId?: string | null
   editingId?: string | null
   onSelect?: (id: string) => void
@@ -456,53 +453,54 @@ function DocumentLayer({
   }, [stamp, pinned, selected])
 
   return (
-    <KonvaLayer
-      listening={interactive}
-      clipX={clip?.x ?? 0}
-      clipY={clip?.y ?? 0}
-      clipWidth={clip?.width ?? document.width}
-      clipHeight={clip?.height ?? document.height}
-    >
-      {layers.map((layer) =>
-        layer.kind === 'text' ? (
-          <TextLayer
-            key={layer.id}
-            layer={layer}
-            preview={layerPreview?.id === layer.id ? layerPreview : null}
-            pinned={pinned?.id === layer.id ? pinned : null}
-            interactive={interactive}
-            stageDraggable={stageDraggable}
-            selected={selectedId === layer.id}
-            editing={editingId === layer.id}
-            onSelect={onSelect}
-            onMove={onMove}
-            onEdit={onEdit}
-            onHoldStage={onHoldStage}
-            onRegister={register}
-          />
-        ) : layer.kind === 'image' ? (
-          <ImageLayer
-            key={layer.id}
-            layer={layer}
-            url={layer.asset_id ? urls.get(layer.asset_id) : undefined}
-            color={color ?? null}
-            preview={layerPreview?.id === layer.id ? layerPreview : null}
-            pinned={pinned?.id === layer.id ? pinned : null}
-            interactive={interactive}
-            stageDraggable={stageDraggable}
-            selected={selectedId === layer.id}
-            onSelect={onSelect}
-            onMove={onMove}
-            onHoldStage={onHoldStage}
-            onRegister={register}
-          />
-        ) : null,
-      )}
+    <KonvaLayer listening={interactive}>
+      {/* 只裁图层内容；变换框放在裁切组外面，否则画布边缘的手柄会被截掉一半 */}
+      <Group
+        clipX={clip?.x ?? 0}
+        clipY={clip?.y ?? 0}
+        clipWidth={clip?.width ?? document.width}
+        clipHeight={clip?.height ?? document.height}
+      >
+        {layers.map((layer) =>
+          layer.kind === 'text' ? (
+            <TextLayer
+              key={layer.id}
+              layer={layer}
+              preview={layerPreview?.id === layer.id ? layerPreview : null}
+              pinned={pinned?.id === layer.id ? pinned : null}
+              interactive={interactive}
+              stageDraggable={stageDraggable}
+              selected={selectedId === layer.id}
+              editing={editingId === layer.id}
+              onSelect={onSelect}
+              onMove={onMove}
+              onEdit={onEdit}
+              onHoldStage={onHoldStage}
+              onRegister={register}
+            />
+          ) : layer.kind === 'image' ? (
+            <ImageLayer
+              key={layer.id}
+              layer={layer}
+              url={layer.asset_id ? urls.get(layer.asset_id) : undefined}
+              color={color ?? null}
+              preview={layerPreview?.id === layer.id ? layerPreview : null}
+              pinned={pinned?.id === layer.id ? pinned : null}
+              interactive={interactive}
+              stageDraggable={stageDraggable}
+              selected={selectedId === layer.id}
+              onSelect={onSelect}
+              onMove={onMove}
+              onHoldStage={onHoldStage}
+              onRegister={register}
+            />
+          ) : null,
+        )}
+      </Group>
       {interactive && selected && selectedNode && editingId !== selected.id && (
         <LayerScaler
           node={selectedNode}
           layer={selected}
-          viewScale={viewScale}
           onScale={(layerId, scale, x, y) => {
             waitingStamp.current = stamp
             setPinned({ id: layerId, scale, x, y })
@@ -849,18 +847,17 @@ function useLayerInteract(
 function LayerScaler({
   node,
   layer,
-  viewScale,
   onScale,
   onHoldStage,
 }: {
   node: Konva.Node
   layer: Layer
-  viewScale: number
   onScale?: (layerId: string, scale: number, x: number, y: number) => void
   onHoldStage?: (held: boolean) => void
 }) {
+  // Transformer 的手柄本身按屏幕像素绘制、不随画布缩放，尺寸不能再乘 1/scale，
+  // 否则缩小画布时手柄反而越来越大
   const ref = useRef<Konva.Transformer>(null)
-  const invert = 1 / viewScale
 
   useEffect(() => {
     const transformer = ref.current
@@ -880,11 +877,11 @@ function LayerScaler({
       keepRatio
       enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
       ignoreStroke
-      anchorSize={9 * invert}
+      anchorSize={10}
       anchorCornerRadius={0}
       anchorFill={INK.paper}
-      anchorStrokeWidth={2 * invert}
-      borderStrokeWidth={1.5 * invert}
+      anchorStrokeWidth={2}
+      borderStrokeWidth={1.5}
       anchorStroke={INK.brand}
       borderStroke={INK.brand}
       boundBoxFunc={(oldBox, newBox) => {
@@ -1054,11 +1051,11 @@ function CropLayer({
         flipEnabled={false}
         keepRatio={keepRatio}
         ignoreStroke
-        anchorSize={9 * invert}
+        anchorSize={10}
         anchorCornerRadius={0}
         anchorFill={INK.paper}
-        anchorStrokeWidth={2 * invert}
-        borderStrokeWidth={1.5 * invert}
+        anchorStrokeWidth={2}
+        borderStrokeWidth={1.5}
         anchorStroke={INK.brand}
         borderStroke={INK.brand}
         boundBoxFunc={(oldBox, newBox) =>
