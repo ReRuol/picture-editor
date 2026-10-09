@@ -6,6 +6,7 @@ from httpx import ASGITransport
 from sqlalchemy import delete
 
 from app import events
+from app.agent.llm import planner
 from app.config import get_settings
 from app.db import SessionFactory
 from app.main import app
@@ -33,6 +34,22 @@ def mock_provider():
     yield
     settings.image_provider = original
     get_image_provider.cache_clear()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def offline_planner():
+    """规划模型同理：不受本机 PLANNER_PROVIDER 和真实 key 影响，测试需要时自己设 key。"""
+    settings = get_settings()
+    fields = ("planner_provider", "dashscope_api_key", "volcengine_api_key", "deepseek_api_key")
+    original = {name: getattr(settings, name) for name in fields}
+    settings.planner_provider = "dashscope"
+    for name in fields[1:]:
+        setattr(settings, name, "")
+    planner.cache_clear()
+    yield
+    for name, value in original.items():
+        setattr(settings, name, value)
+    planner.cache_clear()
 
 
 @pytest.fixture(scope="session", autouse=True)
