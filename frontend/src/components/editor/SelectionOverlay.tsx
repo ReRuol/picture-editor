@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { Circle, Group, Image as KonvaImage, Layer as KonvaLayer, Line, Text } from 'react-konva'
+import { Circle, Group, Image as KonvaImage, Layer as KonvaLayer, Line, Rect, Text } from 'react-konva'
 
 import type { LayerDocument } from '@/api/sessions'
 import { useCanvasImage } from '@/hooks/useCanvasImage'
 import { brushWidth } from '@/lib/brush'
+import { INK } from '@/lib/riso'
 import type { CanvasSelection } from '@/stores/editorUi'
 
 export function SelectionOverlay({
@@ -59,8 +60,8 @@ export function SelectionOverlay({
         <Line
           points={draft.flatMap((point) => [point.x * document.width, point.y * document.height])}
           closed={draft.length > 2}
-          fill={draft.length > 2 ? '#5f98ad' : undefined}
-          stroke="#5f98ad"
+          fill={draft.length > 2 ? INK.accent : undefined}
+          stroke={INK.accent}
           strokeWidth={brushWidth(document)}
           lineCap="round"
           lineJoin="round"
@@ -98,8 +99,9 @@ function MarkerBadge({
   const invert = 1 / scale
   return (
     <Group x={x} y={y} scaleX={invert} scaleY={invert} listening={false}>
-      {pending && <Circle radius={17} stroke="#5f98ad" strokeWidth={2} opacity={0.45} />}
-      <Circle radius={11} fill="#5f98ad" shadowColor="#141a14" shadowBlur={8} shadowOpacity={0.35} />
+      {pending && <Circle radius={17} stroke={INK.accent} strokeWidth={2} dash={[4, 3]} />}
+      <Rect x={-9} y={-9} width={22} height={22} fill={INK.accent} opacity={0.7} />
+      <Rect x={-11} y={-11} width={22} height={22} fill={INK.brand} />
       <Text
         text={String(index)}
         width={22}
@@ -110,7 +112,7 @@ function MarkerBadge({
         verticalAlign="middle"
         fontSize={11}
         fontStyle="600"
-        fill="#ffffff"
+        fill={INK.paper}
       />
     </Group>
   )

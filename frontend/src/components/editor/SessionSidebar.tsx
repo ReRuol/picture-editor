@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PanelLeftClose } from 'lucide-react'
 import { Link, NavLink } from 'react-router-dom'
 
 import AgentConversation from '@/components/editor/AgentConversation'
@@ -9,10 +10,12 @@ import { useSendMessage, useTurns } from '@/hooks/useAgent'
 import { errorMessage } from '@/hooks/useAuth'
 import { useSessions } from '@/hooks/useSessions'
 import { formatDateTime } from '@/lib/format'
+import { useEditorUi } from '@/stores/editorUi'
 
 export default function SessionSidebar({ activeId }: { activeId: string }) {
   // 历史对话默认收起，尽量把纵向空间留给当前对话
   const [historyOpen, setHistoryOpen] = useState(false)
+  const setChatOpen = useEditorUi((state) => state.setChatOpen)
 
   return (
     <aside className="border-line bg-paper flex w-72 shrink-0 flex-col border-r">
@@ -30,6 +33,11 @@ export default function SessionSidebar({ activeId }: { activeId: string }) {
         >
           历史
         </Button>
+        {activeId && (
+          <Button variant="icon" title="收起对话" onClick={() => setChatOpen(false)}>
+            <PanelLeftClose className="size-4" aria-hidden />
+          </Button>
+        )}
       </div>
 
       {historyOpen && <SessionList activeId={activeId} />}
@@ -49,17 +57,20 @@ function Conversation({ sessionId }: { sessionId: string }) {
   const send = useSendMessage(sessionId)
   const { data: turns = [] } = useTurns(sessionId)
   const planActive = turns.some((turn) => turn.status === 'queued' || turn.status === 'running')
+  const [draft, setDraft] = useState('')
 
   return (
     <>
-      <AgentConversation sessionId={sessionId} />
+      <AgentConversation sessionId={sessionId} onExample={setDraft} />
       <MessageComposer
+        value={draft}
+        onChange={setDraft}
         pending={send.isPending || planActive}
         error={send.isError ? errorMessage(send.error) : null}
         placeholder={
           planActive
             ? '当前计划进行中，确认、取消或等它结束后再发'
-            : '说明要怎么改，例如：去背景再水平翻转。回车发送'
+            : '说说要怎么改，回车发送'
         }
         onSend={(text) => send.mutate(text)}
       />
@@ -86,7 +97,7 @@ function SessionList({ activeId }: { activeId: string }) {
             to={`/editor/${session.id}`}
             className={`rounded-chip block px-2.5 py-2 transition-colors duration-150 ${
               session.id === activeId
-                ? 'bg-brand-soft text-brand-strong'
+                ? 'bg-brand text-paper'
                 : 'text-muted hover:bg-soft hover:text-ink'
             }`}
           >

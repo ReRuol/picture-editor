@@ -10,7 +10,10 @@ const KIND_LABELS: Record<AssetKind, string> = {
   export: '导出',
 }
 
-/** 会话内全部图片，含未采用的候选。点击切换画布当前图，不覆盖任何已有结果。 */
+/**
+ * 会话内全部图片，含未采用的候选。点击切换画布当前图，不覆盖任何已有结果。
+ * 只有一张时就是画布本身，整条不显示，把高度让给画布。
+ */
 export default function ImageWall({
   assets,
   currentId,
@@ -22,16 +25,18 @@ export default function ImageWall({
   disabled: boolean
   onPick: (assetId: string) => void
 }) {
+  const shown = assets
+    .filter((asset) => asset.kind !== 'mask')
+    .filter(
+      (asset) =>
+        asset.id === currentId || (asset.kind !== 'subject' && asset.kind !== 'background'),
+    )
+  if (shown.length <= 1) return null
+
   return (
-    <div className="border-line bg-paper shrink-0 border-t">
-      <div className="scrollbar-slim flex scroll-px-4 items-center gap-2 overflow-x-auto px-4 py-3">
-        {assets
-          .filter((asset) => asset.kind !== 'mask')
-          .filter(
-            (asset) =>
-              asset.id === currentId || (asset.kind !== 'subject' && asset.kind !== 'background'),
-          )
-          .map((asset) => {
+    <div className="border-line bg-paper animate-fade-in shrink-0 border-t">
+      <div className="scrollbar-slim flex scroll-px-4 items-start gap-3 overflow-x-auto px-4 pt-2.5 pb-2">
+        {shown.map((asset) => {
           const active = asset.id === currentId
           return (
             <button
@@ -44,19 +49,20 @@ export default function ImageWall({
                   ? `当前画布 · ${KIND_LABELS[asset.kind]}`
                   : `采用这张 · ${KIND_LABELS[asset.kind]} ${asset.width}×${asset.height}`
               }
-              className={`bg-canvas group rounded-chip relative size-16 shrink-0 overflow-hidden border-2 transition-all duration-150 disabled:cursor-default ${
-                active
-                  ? 'border-brand shadow-control'
-                  : 'border-line hover:border-brand hover:shadow-control active:scale-[0.97]'
-              }`}
+              className="group flex shrink-0 flex-col items-center gap-1 disabled:cursor-default"
             >
-              <img
-                src={asset.url}
-                alt=""
-                loading="lazy"
-                className="size-full object-contain transition-transform duration-150 group-hover:scale-[1.03]"
-              />
-              <span className="bg-ink/70 absolute right-0 bottom-0 left-0 py-0.5 text-[10px] text-white">
+              <span
+                className={`bg-stage rounded-chip block size-12 overflow-hidden border-2 transition-[border-color,box-shadow,translate] duration-150 ${
+                  active
+                    ? 'border-brand shadow-print'
+                    : 'border-line group-hover:border-brand group-active:translate-px'
+                }`}
+              >
+                <img src={asset.url} alt="" loading="lazy" className="size-full object-contain" />
+              </span>
+              <span
+                className={`text-[10px] leading-none ${active ? 'text-brand font-semibold' : 'text-faint'}`}
+              >
                 {KIND_LABELS[asset.kind]}
               </span>
             </button>

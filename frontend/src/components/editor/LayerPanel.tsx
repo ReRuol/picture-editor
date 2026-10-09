@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Info } from 'lucide-react'
 
 import type { Asset } from '@/api/assets'
 import { ACTION_LABELS, type Layer, type SessionDetail } from '@/api/sessions'
@@ -9,19 +10,43 @@ import { formatBytes, formatDateTime } from '@/lib/format'
 import { wallOnly } from '@/lib/layers'
 import { useEditorUi, type Panel } from '@/stores/editorUi'
 
-const ADJUST_FIELDS: { key: string; label: string; min?: number }[] = [
-  { key: 'brightness', label: '亮度' },
-  { key: 'contrast', label: '对比度' },
-  { key: 'highlights', label: '高光' },
-  { key: 'shadows', label: '阴影' },
-  { key: 'temperature', label: '色温' },
-  { key: 'tint', label: '色调' },
-  { key: 'saturation', label: '饱和度' },
-  { key: 'vibrance', label: '自然饱和度' },
-  { key: 'sharpness', label: '锐化' },
-  { key: 'clarity', label: '清晰度' },
-  { key: 'vignette', label: '晕影', min: 0 },
+type AdjustField = { key: string; label: string; min?: number }
+
+const ADJUST_GROUPS: { title: string; fields: AdjustField[] }[] = [
+  {
+    title: '光影',
+    fields: [
+      { key: 'brightness', label: '亮度' },
+      { key: 'contrast', label: '对比度' },
+      { key: 'highlights', label: '高光' },
+      { key: 'shadows', label: '阴影' },
+    ],
+  },
+  {
+    title: '色彩',
+    fields: [
+      { key: 'temperature', label: '色温' },
+      { key: 'tint', label: '色调' },
+      { key: 'saturation', label: '饱和度' },
+      { key: 'vibrance', label: '自然饱和度' },
+    ],
+  },
+  {
+    title: '细节',
+    // 晕影只能加不能减，滑杆从 0 起
+    fields: [
+      { key: 'sharpness', label: '锐化' },
+      { key: 'clarity', label: '清晰度' },
+      { key: 'vignette', label: '晕影', min: 0 },
+    ],
+  },
 ]
+
+/** 内部取值 -1~1，给人看的是 -100~100 的整数，正值带加号 */
+function signed(value: number) {
+  const rounded = Math.round(value * 100)
+  return rounded > 0 ? `+${rounded}` : String(rounded)
+}
 
 const REORDER_LABELS = {
   top: '置顶',
@@ -90,129 +115,127 @@ export default function LayerPanel({
         />
       )}
 
-      <Section title="图层">
-        <label className="text-muted mb-2 flex items-center gap-1.5 text-[11px]">
-          <input
-            type="checkbox"
-            checked={includeText}
-            disabled={tools.busy}
-            onChange={(event) => setIncludeText(event.target.checked)}
-          />
-          同时拆出文字
-        </label>
-        <div className="mb-2.5 flex gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            block
-            disabled={tools.busy}
-            progress={tools.isRunning('split_layers') ? tools.pendingProgress : null}
-            title={includeText ? '拆成背景、主体和文字，可撤销' : '拆成背景和主体，可撤销'}
-            onClick={() => tools.invoke('split_layers', { include_text: includeText })}
-          >
-            拆层
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            block
-            disabled={tools.busy || !selection}
-            progress={tools.isRunning('promote_object_to_layer') ? tools.pendingProgress : null}
-            title={selection ? '把选区提升为独立图层，可撤销' : '先点选或涂抹'}
-            onClick={() =>
-              tools.invoke('promote_object_to_layer', {
-                mask_asset_id: selection?.maskId,
-                revision: session.revision,
-              })
-            }
-          >
-            成层
-          </Button>
-        </div>
-        <ul className="space-y-1">
-          {[...session.document.layers].reverse().map((layer) => (
-            <LayerRow
-              key={layer.id}
-              layer={layer}
-              active={selected?.id === layer.id}
-              disabled={tools.busy}
-              thumb={layer.asset_id ? session.assets.find((asset) => asset.id === layer.asset_id) : undefined}
-              onSelect={() => selectLayer(layer.id)}
-              onToggleVisible={() =>
-                tools.invoke('set_layer_visible', {
-                  layer_id: layer.id,
-                  visible: !layer.visible,
-                })
-              }
-            />
-          ))}
-        </ul>
-      </Section>
+      {panel === 'layers' && (
+        <>
+          <Section title="图层">
+            <label className="text-muted mb-2 flex items-center gap-1.5 text-[11px]">
+              <input
+                type="checkbox"
+                checked={includeText}
+                disabled={tools.busy}
+                onChange={(event) => setIncludeText(event.target.checked)}
+              />
+              同时拆出文字
+            </label>
+            <div className="mb-2.5 flex gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                block
+                disabled={tools.busy}
+                progress={tools.isRunning('split_layers') ? tools.pendingProgress : null}
+                title={includeText ? '拆成背景、主体和文字，可撤销' : '拆成背景和主体，可撤销'}
+                onClick={() => tools.invoke('split_layers', { include_text: includeText })}
+              >
+                拆层
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                block
+                disabled={tools.busy || !selection}
+                progress={tools.isRunning('promote_object_to_layer') ? tools.pendingProgress : null}
+                title={selection ? '把选区提升为独立图层，可撤销' : '先点选或涂抹'}
+                onClick={() =>
+                  tools.invoke('promote_object_to_layer', {
+                    mask_asset_id: selection?.maskId,
+                    revision: session.revision,
+                  })
+                }
+              >
+                成层
+              </Button>
+            </div>
+            <ul className="space-y-1">
+              {[...session.document.layers].reverse().map((layer) => (
+                <LayerRow
+                  key={layer.id}
+                  layer={layer}
+                  active={selected?.id === layer.id}
+                  disabled={tools.busy}
+                  thumb={layer.asset_id ? session.assets.find((asset) => asset.id === layer.asset_id) : undefined}
+                  onSelect={() => selectLayer(layer.id)}
+                  onToggleVisible={() =>
+                    tools.invoke('set_layer_visible', {
+                      layer_id: layer.id,
+                      visible: !layer.visible,
+                    })
+                  }
+                />
+              ))}
+            </ul>
+          </Section>
 
-      {selected?.kind === 'text' && (
-        <Section title="文字">
-          <p className="text-faint mb-2.5 text-[11px] leading-relaxed">
-            改文案、字号或颜色。失焦写入，可用 ⌘Z 撤销。画布上双击文字层也可改。
-          </p>
-          <TextForm
-            layer={selected}
-            disabled={tools.busy}
-            onCommit={(params) =>
-              tools.invoke('set_layer_text', { layer_id: selected.id, ...params })
-            }
-          />
-        </Section>
+          {selected?.kind === 'text' && (
+            <Section title="文字" hint="失焦写入，⌘Z 撤销；画布上双击文字层也可改">
+              <TextForm
+                layer={selected}
+                disabled={tools.busy}
+                onCommit={(params) =>
+                  tools.invoke('set_layer_text', { layer_id: selected.id, ...params })
+                }
+              />
+            </Section>
+          )}
+
+          {selected && (
+            <Section title="变换" hint="画布上拖角缩放、拖动移动；滑杆松手写入，⌘Z 撤销">
+              <LayerControls
+                layer={selected}
+                disabled={tools.busy}
+                onOpacity={(opacity) =>
+                  tools.invoke('set_layer_opacity', {
+                    layer_id: selected.id,
+                    opacity,
+                  })
+                }
+                onScale={(scale) =>
+                  tools.invoke('scale_layer', {
+                    layer_id: selected.id,
+                    scale_x: scale,
+                    scale_y: scale,
+                  })
+                }
+                onRotate={(rotation) =>
+                  tools.invoke('rotate_layer', { layer_id: selected.id, rotation })
+                }
+                onReorder={(place) => tools.invoke('reorder_layer', { layer_id: selected.id, place })}
+              />
+            </Section>
+          )}
+
+          <Section title="属性">
+            <Properties document={session.document} current={current} revision={session.revision} />
+          </Section>
+
+          <Section title="编辑记录">
+            {history.length === 0 ? (
+              <p className="text-faint text-xs">暂无记录</p>
+            ) : (
+              <ol className="space-y-1.5">
+                {history.map((entry) => (
+                  <li key={entry.seq} className="flex items-baseline justify-between gap-2 text-xs">
+                    <span className="text-ink">{ACTION_LABELS[entry.action] ?? entry.action}</span>
+                    <span className="text-faint shrink-0 tabular-nums">
+                      {formatDateTime(entry.created_at)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </Section>
+        </>
       )}
-
-      {selected && (
-        <Section title="变换">
-          <p className="text-faint mb-2.5 text-[11px] leading-relaxed">
-            选中图层后拖角缩放、拖动画布移动。滑杆也可改，松手写入，可用 ⌘Z 撤销。
-          </p>
-          <LayerControls
-            layer={selected}
-            disabled={tools.busy}
-            onOpacity={(opacity) =>
-              tools.invoke('set_layer_opacity', {
-                layer_id: selected.id,
-                opacity,
-              })
-            }
-            onScale={(scale) =>
-              tools.invoke('scale_layer', {
-                layer_id: selected.id,
-                scale_x: scale,
-                scale_y: scale,
-              })
-            }
-            onRotate={(rotation) =>
-              tools.invoke('rotate_layer', { layer_id: selected.id, rotation })
-            }
-            onReorder={(place) => tools.invoke('reorder_layer', { layer_id: selected.id, place })}
-          />
-        </Section>
-      )}
-
-      <Section title="属性">
-        <Properties document={session.document} current={current} revision={session.revision} />
-      </Section>
-
-      <Section title="编辑记录">
-        {history.length === 0 ? (
-          <p className="text-faint text-xs">暂无记录</p>
-        ) : (
-          <ol className="space-y-1.5">
-            {history.map((entry) => (
-              <li key={entry.seq} className="flex items-baseline justify-between gap-2 text-xs">
-                <span className="text-ink">{ACTION_LABELS[entry.action] ?? entry.action}</span>
-                <span className="text-faint shrink-0 tabular-nums">
-                  {formatDateTime(entry.created_at)}
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
-      </Section>
     </aside>
   )
 }
@@ -243,7 +266,7 @@ function LayerRow({
         onClick={onSelect}
         className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left"
       >
-        <span className="bg-canvas border-line rounded-chip size-8 shrink-0 overflow-hidden border">
+        <span className="bg-stage border-line rounded-chip size-8 shrink-0 overflow-hidden border">
           {thumb ? (
             <img src={thumb.url} alt="" className="size-full object-cover" />
           ) : (
@@ -523,31 +546,35 @@ function AdjustForm({
   }
 
   return (
-    <Section title="调色">
-      <p className="text-faint mb-2.5 text-[11px] leading-relaxed">
-        拖动即在画布预览，锐化与清晰度需应用后可见。点应用写入新版本，可撤销。
-      </p>
-      <div className="space-y-2.5">
-        {ADJUST_FIELDS.map((field) => (
-          <SliderField
-            key={field.key}
-            label={field.label}
-            value={values[field.key] ?? 0}
-            origin={0}
-            min={field.min ?? -1}
-            max={1}
-            step={0.05}
-            format={(value) => value.toFixed(2)}
-            disabled={disabled}
-            onInput={(value) => setAdjustPreview({ ...values, [field.key]: value })}
-            onCommit={(value) => {
-              const next = { ...values, [field.key]: value }
-              setValues(next)
-              setAdjustPreview(next)
-            }}
-          />
+    <Section title="调色" hint="拖动即预览，锐化与清晰度应用后可见；双击滑杆复位">
+      <div className="space-y-4">
+        {ADJUST_GROUPS.map((group) => (
+          <fieldset key={group.title} className="space-y-2.5">
+            <legend className="text-faint mb-2 font-mono text-[10px] tracking-widest">
+              {group.title}
+            </legend>
+            {group.fields.map((field) => (
+              <SliderField
+                key={field.key}
+                label={field.label}
+                value={values[field.key] ?? 0}
+                origin={0}
+                min={field.min ?? -1}
+                max={1}
+                step={0.05}
+                format={signed}
+                disabled={disabled}
+                onInput={(value) => setAdjustPreview({ ...values, [field.key]: value })}
+                onCommit={(value) => {
+                  const next = { ...values, [field.key]: value }
+                  setValues(next)
+                  setAdjustPreview(next)
+                }}
+              />
+            ))}
+          </fieldset>
         ))}
-        <div className="flex gap-2">
+        <div className="border-line flex gap-2 border-t pt-3">
           <Button variant="outline" block disabled={disabled || !touched} onClick={clear}>
             重置
           </Button>
@@ -610,7 +637,7 @@ function SliderField({
     >
       <span className="mb-1 flex justify-between text-[11px]">
         <span className="text-muted">{label}</span>
-        <span className="text-ink tabular-nums">{format(draft ?? value)}</span>
+        <span className="text-ink font-mono">{format(draft ?? value)}</span>
       </span>
       <input
         type="range"
@@ -656,17 +683,34 @@ function Properties({
       {rows.map(([label, value]) => (
         <div key={label} className="flex justify-between gap-2">
           <dt className="text-muted">{label}</dt>
-          <dd className="text-ink tabular-nums">{value}</dd>
+          <dd className="text-ink font-mono text-[11px]">{value}</dd>
         </div>
       ))}
     </dl>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+/** 操作说明不常驻成段落，收进标题旁的 (i)，悬停可见 */
+function Section({
+  title,
+  hint,
+  children,
+}: {
+  title: string
+  hint?: string
+  children: React.ReactNode
+}) {
   return (
     <section className="border-line border-b px-4 py-4 last:border-b-0">
-      <h2 className="text-muted mb-2.5 text-xs font-medium">{title}</h2>
+      <h2 className="text-ink mb-3 flex items-center gap-1.5 text-[13px] font-semibold">
+        <span className="bg-accent size-1.5" aria-hidden />
+        {title}
+        {hint && (
+          <span title={hint} className="text-faint ml-auto cursor-help">
+            <Info className="size-3.5" aria-label={hint} />
+          </span>
+        )}
+      </h2>
       {children}
     </section>
   )

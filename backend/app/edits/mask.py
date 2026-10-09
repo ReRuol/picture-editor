@@ -14,7 +14,7 @@ def to_luma(data: bytes, size: tuple[int, int] | None = None) -> Image.Image:
     return mask
 
 
-def overlay_png(mask: Image.Image, *, color: tuple[int, int, int] = (95, 152, 173)) -> bytes:
+def overlay_png(mask: Image.Image, *, color: tuple[int, int, int] = (255, 72, 176)) -> bytes:
     """选区可视化：选中处半透明着色，其余全透明。"""
     luma = mask.convert("L")
     overlay = Image.new("RGBA", luma.size, (*color, 0))

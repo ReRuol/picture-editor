@@ -29,7 +29,10 @@ export function BackgroundForm({
 
   return (
     <section className="border-line border-b px-4 py-4">
-      <h2 className="text-muted mb-2.5 text-xs font-medium">换背景</h2>
+      <h2 className="text-ink mb-3 flex items-center gap-1.5 text-[13px] font-semibold">
+        <span className="bg-accent size-1.5" aria-hidden />
+        换背景
+      </h2>
       <p className="text-faint mb-2.5 text-[11px] leading-relaxed">
         {wallOnly
           ? '写出新背景。已拆层，结果拍平成整图只进图片墙，点选采用；画布与图层保持不变。'
@@ -87,7 +90,10 @@ export function ExpandForm({
 
   return (
     <section className="border-line border-b px-4 py-4">
-      <h2 className="text-muted mb-2.5 text-xs font-medium">扩图</h2>
+      <h2 className="text-ink mb-3 flex items-center gap-1.5 text-[13px] font-semibold">
+        <span className="bg-accent size-1.5" aria-hidden />
+        扩图
+      </h2>
       <p className="text-faint mb-2.5 text-[11px] leading-relaxed">
         {wallOnly
           ? '扩展到目标比例，主体保留在画面中。已拆层，结果只进图片墙，点选采用；画布与图层保持不变。'
@@ -133,7 +139,10 @@ export function ReplaceForm({
 
   return (
     <section className="border-line border-b px-4 py-4">
-      <h2 className="text-muted mb-2.5 text-xs font-medium">局部替换</h2>
+      <h2 className="text-ink mb-3 flex items-center gap-1.5 text-[13px] font-semibold">
+        <span className="bg-accent size-1.5" aria-hidden />
+        局部替换
+      </h2>
       <p className="text-faint mb-2.5 text-[11px] leading-relaxed">
         只改当前选区。选区外的画面会保持不动。
       </p>

@@ -30,6 +30,7 @@ export type LayerPreview = {
 export type Panel = 'layers' | 'adjust' | 'background' | 'expand' | 'replace' | null
 
 type EditorUi = {
+  chatOpen: boolean
   selectedLayerId: string | null
   cropOpen: boolean
   cropRatio: CropRatio
@@ -42,6 +43,7 @@ type EditorUi = {
   splitIncludeText: boolean
   adjustPreview: Record<string, number> | null
   layerPreview: LayerPreview | null
+  setChatOpen: (open: boolean) => void
   selectLayer: (id: string | null) => void
   openCrop: (document: LayerDocument, ratio?: CropRatio) => void
   setCropRatio: (ratio: CropRatio, document: LayerDocument) => void
@@ -86,7 +88,11 @@ function fitCrop(document: LayerDocument, ratio: CropRatio): CropRect {
 // 局部替换依赖当轮选区，一旦离开选择模式表单就没用了，留着只会挡住画布
 const withoutReplace = (panel: Panel): Panel => (panel === 'replace' ? null : panel)
 
+// 窄屏默认收起对话栏，把宽度让给画布
+const WIDE_ENOUGH_FOR_CHAT = 1180
+
 export const useEditorUi = create<EditorUi>((set) => ({
+  chatOpen: typeof window === 'undefined' || window.innerWidth >= WIDE_ENOUGH_FOR_CHAT,
   selectedLayerId: null,
   cropOpen: false,
   cropRatio: 'free',
@@ -99,6 +105,8 @@ export const useEditorUi = create<EditorUi>((set) => ({
   splitIncludeText: false,
   adjustPreview: null,
   layerPreview: null,
+
+  setChatOpen: (chatOpen) => set({ chatOpen }),
 
   selectLayer: (selectedLayerId) =>
     set((state) => ({

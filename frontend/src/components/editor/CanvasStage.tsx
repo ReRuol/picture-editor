@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type Konva from 'konva'
 import {
-  Circle,
   Group,
   Image as KonvaImage,
   Layer as KonvaLayer,
@@ -19,6 +18,7 @@ import { usePointPreview } from '@/hooks/usePointPreview'
 import { useSelectStroke } from '@/hooks/useSelectStroke'
 import { useCanvasImage } from '@/hooks/useCanvasImage'
 import { useElementSize } from '@/hooks/useElementSize'
+import { INK } from '@/lib/riso'
 import { makeAdjustFilter, toAdjustPreview, type AdjustPreview } from '@/lib/adjustPreview'
 import { useCanvasView } from '@/stores/canvasView'
 import { useEditorUi, type CanvasSelection, type CropRect, type LayerPreview } from '@/stores/editorUi'
@@ -161,7 +161,7 @@ export default function CanvasStage({
   return (
     <div
       ref={containerRef}
-      className={`bg-canvas relative h-full w-full overflow-hidden ${
+      className={`bg-stage relative h-full w-full overflow-hidden ${
         selecting || cropOpen ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
       }`}
     >
@@ -318,9 +318,9 @@ function CanvasBoard({ width, height }: { width: number; height: number }) {
         width={width}
         height={height}
         fill="#ffffff"
-        shadowColor="#141a14"
-        shadowBlur={32}
-        shadowOpacity={0.16}
+        stroke={INK.frame}
+        strokeWidth={1}
+        strokeScaleEnabled={false}
       />
     </KonvaLayer>
   )
@@ -573,7 +573,7 @@ function TextLayer({
         onSelect?.(layer.id)
         onEdit?.(layer.id)
       }}
-      stroke={selected && interactive && !editing ? '#5f98ad' : undefined}
+      stroke={selected && interactive && !editing ? INK.brand : undefined}
       strokeWidth={selected && interactive && !editing ? 2 : 0}
       strokeScaleEnabled={false}
     />
@@ -711,7 +711,7 @@ function ImageLayer({
       opacity={preview?.opacity ?? layer.opacity}
       filters={filters}
       {...drag.handlers}
-      stroke={selected && interactive ? '#5f98ad' : undefined}
+      stroke={selected && interactive ? INK.brand : undefined}
       strokeWidth={selected && interactive ? 2 : 0}
       strokeScaleEnabled={false}
     />
@@ -880,12 +880,13 @@ function LayerScaler({
       keepRatio
       enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
       ignoreStroke
-      anchorSize={10 * invert}
-      anchorCornerRadius={3 * invert}
-      anchorStrokeWidth={1.5 * invert}
-      borderStrokeWidth={invert}
-      anchorStroke="#427f95"
-      borderStroke="#5f98ad"
+      anchorSize={9 * invert}
+      anchorCornerRadius={0}
+      anchorFill={INK.paper}
+      anchorStrokeWidth={2 * invert}
+      borderStrokeWidth={1.5 * invert}
+      anchorStroke={INK.brand}
+      borderStroke={INK.brand}
       boundBoxFunc={(oldBox, newBox) => {
         const min = MIN_LAYER_SCALE * Math.min(layer.width, layer.height)
         const max = MAX_LAYER_SCALE * Math.max(layer.width, layer.height)
@@ -930,12 +931,9 @@ function CompareDivider({
     <KonvaLayer>
       <Line
         points={[split, 0, split, canvas.height]}
-        stroke="#ffffff"
+        stroke={INK.accent}
         strokeWidth={2}
         strokeScaleEnabled={false}
-        shadowColor="#141a14"
-        shadowBlur={8}
-        shadowOpacity={0.45}
         listening={false}
       />
       <Group
@@ -956,15 +954,10 @@ function CompareDivider({
           onChange(next / canvas.width)
         }}
       >
-        <Circle
-          radius={15}
-          fill="#ffffff"
-          shadowColor="#141a14"
-          shadowBlur={10}
-          shadowOpacity={0.3}
-        />
-        <Line points={[-7, -4, -11, 0, -7, 4]} stroke="#6f746f" strokeWidth={1.6} lineCap="round" />
-        <Line points={[7, -4, 11, 0, 7, 4]} stroke="#6f746f" strokeWidth={1.6} lineCap="round" />
+        <Rect x={-13} y={-13} width={30} height={30} fill={INK.accent} opacity={0.6} listening={false} />
+        <Rect x={-15} y={-15} width={30} height={30} fill={INK.brand} />
+        <Line points={[-4, -5, -9, 0, -4, 5]} stroke={INK.paper} strokeWidth={2} />
+        <Line points={[4, -5, 9, 0, 4, 5]} stroke={INK.paper} strokeWidth={2} />
       </Group>
     </KonvaLayer>
   )
@@ -1003,7 +996,7 @@ function CropLayer({
 
   // 手柄与描边按倍率反向补偿，缩放后依然是同样的点按面积
   const invert = 1 / scale
-  const shade = 'rgba(20,26,20,0.45)'
+  const shade = 'rgba(19,41,75,0.5)'
 
   return (
     <KonvaLayer>
@@ -1030,7 +1023,7 @@ function CropLayer({
         y={rect.y}
         width={rect.width}
         height={rect.height}
-        stroke="#5f98ad"
+        stroke={INK.brand}
         strokeWidth={2}
         strokeScaleEnabled={false}
         dash={[7 * invert, 5 * invert]}
@@ -1061,12 +1054,13 @@ function CropLayer({
         flipEnabled={false}
         keepRatio={keepRatio}
         ignoreStroke
-        anchorSize={10 * invert}
-        anchorCornerRadius={3 * invert}
-        anchorStrokeWidth={1.5 * invert}
-        borderStrokeWidth={invert}
-        anchorStroke="#427f95"
-        borderStroke="#5f98ad"
+        anchorSize={9 * invert}
+        anchorCornerRadius={0}
+        anchorFill={INK.paper}
+        anchorStrokeWidth={2 * invert}
+        borderStrokeWidth={1.5 * invert}
+        anchorStroke={INK.brand}
+        borderStroke={INK.brand}
         boundBoxFunc={(oldBox, newBox) =>
           newBox.width < 32 || newBox.height < 32 ? oldBox : newBox
         }

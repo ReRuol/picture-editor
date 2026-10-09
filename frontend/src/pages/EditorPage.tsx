@@ -7,6 +7,7 @@ import EditorToolbar from '@/components/editor/EditorToolbar'
 import ImageWall from '@/components/editor/ImageWall'
 import LayerPanel from '@/components/editor/LayerPanel'
 import SessionSidebar from '@/components/editor/SessionSidebar'
+import ToolRail from '@/components/editor/ToolRail'
 import ProgressBar from '@/components/ui/ProgressBar'
 import { buttonClass } from '@/components/ui/buttonStyles'
 import { useMountTransition } from '@/hooks/useMountTransition'
@@ -20,11 +21,12 @@ const PANEL_EXIT_MS = 200
 
 export default function EditorPage() {
   const { sessionId = '' } = useParams()
+  const chatOpen = useEditorUi((state) => state.chatOpen)
 
   return (
     // 编辑器自成一屏：不让工具条或画布把外层 main 撑出滚动条，否则画布会被滚出视口
     <div className="flex h-full overflow-hidden">
-      <SessionSidebar activeId={sessionId} />
+      {(chatOpen || !sessionId) && <SessionSidebar activeId={sessionId} />}
       {sessionId ? (
         <Workspace sessionId={sessionId} />
       ) : (
@@ -144,10 +146,11 @@ function Workspace({ sessionId }: { sessionId: string }) {
           onRename={(title) => patch.mutate({ title })}
         />
         {tools.pending && (
-          <ProgressBar value={tools.pendingProgress} tone="brand" className="h-0.5 shrink-0" />
+          <ProgressBar value={tools.pendingProgress} tone="accent" className="h-[3px] shrink-0" />
         )}
 
         <div className="relative flex min-h-0 min-w-0 flex-1">
+          <ToolRail session={session} tools={tools} />
           <div className="relative min-h-0 min-w-0 flex-1">
             <CanvasStage
               document={session.document}
@@ -177,7 +180,8 @@ function Workspace({ sessionId }: { sessionId: string }) {
           </div>
           {heldPanel && (
             <div
-              className={`shadow-panel w-72 shrink-0 max-[960px]:absolute max-[960px]:inset-y-0 max-[960px]:right-0 max-[960px]:z-20 ${
+              // 面板占位挤开画布，而不是浮在上面挡住图片；画布随视口变化自动重新适应
+              className={`w-72 shrink-0 ${
                 heldPanel.exiting ? 'animate-slide-out' : 'animate-slide-in'
               }`}
             >

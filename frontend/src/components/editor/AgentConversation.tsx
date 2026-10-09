@@ -18,7 +18,15 @@ const STEP_LABEL: Record<StepStatus, string> = {
   canceled: '已取消',
 }
 
-export default function AgentConversation({ sessionId }: { sessionId: string }) {
+const EXAMPLES = ['去背景再水平翻转', '背景换成浅木色桌面', '整体调亮一点，色温偏暖', '扩成 16:9 横图']
+
+export default function AgentConversation({
+  sessionId,
+  onExample,
+}: {
+  sessionId: string
+  onExample: (text: string) => void
+}) {
   const { data: turns = [], isPending } = useTurns(sessionId)
   const end = useRef<HTMLDivElement>(null)
   const latest = turns.at(-1)
@@ -33,9 +41,22 @@ export default function AgentConversation({ sessionId }: { sessionId: string }) 
 
   if (turns.length === 0) {
     return (
-      <p className="text-faint min-h-0 flex-1 px-4 py-4 text-xs leading-relaxed">
-        用一句话说明要怎么改，例如「水平翻转」或「去背景再调亮一点」。多步计划会先列出再执行。
-      </p>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+        <p className="text-print font-display text-2xl leading-tight">说一句，<br />我来改。</p>
+        <p className="text-muted mt-2 text-xs leading-relaxed">多步的会先列出计划，你点头再执行。</p>
+        <div className="mt-4 flex flex-col items-start gap-1.5">
+          {EXAMPLES.map((text) => (
+            <button
+              key={text}
+              type="button"
+              onClick={() => onExample(text)}
+              className="border-line bg-paper text-ink hover:border-accent hover:text-accent-strong rounded-chip border px-2.5 py-1.5 text-left text-xs transition-colors duration-150 active:translate-px"
+            >
+              {text}
+            </button>
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -52,7 +73,7 @@ export default function AgentConversation({ sessionId }: { sessionId: string }) 
 function TurnBlock({ turn, sessionId }: { turn: Turn; sessionId: string }) {
   return (
     <div className="space-y-2">
-      <p className="bg-brand-soft text-brand-strong ml-6 rounded-control px-3 py-2 text-xs leading-relaxed">
+      <p className="bg-brand text-paper shadow-print rounded-control ml-6 px-3 py-2 text-xs leading-relaxed">
         {turn.goal}
       </p>
 

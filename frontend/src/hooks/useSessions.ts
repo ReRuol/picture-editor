@@ -37,6 +37,25 @@ export function useSessionHistory(id: string | null) {
   })
 }
 
+/** 任务结束时的提示。可撤销的操作在提示里直接给撤销入口，代替事前确认。 */
+function announce(
+  run: { status: string; error: string | null; stage: string },
+  tool: string | undefined,
+  undo: () => void,
+) {
+  if (run.status === 'failed') {
+    toast(run.error || '处理失败', 'danger')
+    return
+  }
+  if (run.status !== 'succeeded') return
+  const label = toolLabel(tool)
+  toast(
+    label ? `${label}完成` : run.stage || '已完成',
+    'ok',
+    offersUndo(tool) ? { action: { label: '撤销', run: undo } } : undefined,
+  )
+}
+
 function useCacheSession(id: string) {
   const queryClient = useQueryClient()
   return (detail: SessionDetail) => {
@@ -81,9 +100,17 @@ export function useSessionTools(id: string) {
   const invoke = useMutation({
     mutationFn: ({ tool, params }: { tool: string; params?: Record<string, unknown> }) =>
       sessionsApi.invoke(id, tool, params),
-    onSuccess: (body) => {
+    onSuccess: (body, variables) => {
       cache(body.session)
-      if (!isTerminal(body.run.status)) setPendingRunId(body.run.id)
+      // 翻转这类同步工具返回时就已结束，不会进 SSE，得在这里播报；
+      // 移动、缩放、透明度是随手操作，成功了不打扰
+      if (isTerminal(body.run.status)) {
+        if (body.run.status === 'failed' || offersUndo(variables.tool)) {
+          announce(body.run, variables.tool, () => undoRef.current())
+        }
+      } else {
+        setPendingRunId(body.run.id)
+      }
     },
     onError: (error) => toast(errorMessage(error), 'danger'),
   })
@@ -122,17 +149,10 @@ export function useSessionTools(id: string) {
     announced.current = pendingRunId
     void queryClient.invalidateQueries({ queryKey: detailKey(id) })
     void queryClient.invalidateQueries({ queryKey: historyKey(id) })
-    if (live.status === 'failed') {
-      toast(live.error || '处理失败', 'danger')
-      return
-    }
-    const label = toolLabel(pendingTool)
-    toast(
-      label ? `${label}完成` : live.stage || '已完成',
-      'ok',
-      offersUndo(pendingTool)
-        ? { action: { label: '撤销', run: () => undoRef.current() } }
-        : undefined,
+    announce(
+      { status: live.status, error: live.error, stage: live.stage },
+      pendingTool,
+      () => undoRef.current(),
     )
   }, [pendingRunId, live.status, live.error, live.stage, pendingTool, id, queryClient])
 

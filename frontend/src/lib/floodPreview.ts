@@ -1,6 +1,7 @@
 import type { Layer, LayerDocument } from '@/api/sessions'
 
-const COLOR = [95, 152, 173, 255] as const
+// 与后端 overlay_png 的选区色一致：Riso 荧光粉
+const COLOR = [255, 72, 176, 255] as const
 const TOLERANCE = 36
 const MAX_SIDE = 480
 const MAX_FILL = 0.55

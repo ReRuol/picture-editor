@@ -47,7 +47,7 @@ export default function WorkbenchLayout() {
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-control px-3 py-2.5 text-sm transition-colors ${
                       isActive
-                        ? 'bg-brand-soft text-brand-strong font-medium'
+                        ? 'bg-brand text-paper shadow-print font-medium'
                         : 'text-muted hover:bg-soft hover:text-ink'
                     }`
                   }
