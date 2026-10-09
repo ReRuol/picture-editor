@@ -226,7 +226,7 @@ function canvasHint({
     return { mode: 'busy', text: pending ? `${stage || '处理中'} · ${progress}%` : '处理中' }
   }
   if (cropOpen) return { mode: 'crop', text: '拖动裁剪框，点确定应用 · Esc 取消' }
-  if (compareOpen) return { mode: 'compare', text: '拖动画布上的圆点对比上一版 · Esc 退出' }
+  if (compareOpen) return { mode: 'compare', text: '拖动中间的手柄对比上一版 · Esc 退出' }
   if (selectMode === 'point') {
     return picking
       ? { mode: 'point-busy', text: '正在识别选区…' }
