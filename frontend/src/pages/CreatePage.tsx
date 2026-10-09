@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom'
 
 import AssetLibrary from '@/components/AssetLibrary'
 import GenerateForm from '@/components/GenerateForm'
-import ImageDropzone from '@/components/ImageDropzone'
 import { errorMessage } from '@/hooks/useAuth'
 import { useAssetLibrary, useUploadAsset } from '@/hooks/useAssets'
 import { useGenerate } from '@/hooks/useRun'
@@ -23,12 +22,15 @@ export default function CreatePage() {
     )
 
   return (
-    <div className="mx-auto max-w-4xl px-8 py-10">
-      <h1 className="text-ink mb-6 text-2xl font-semibold tracking-tight">创作</h1>
+    <div className="mx-auto max-w-5xl px-8 py-10">
+      <h1 className="font-display text-print text-4xl">创作</h1>
+      <p className="text-muted mt-2 mb-7 text-sm">写一句描述生成候选图，或者上传已有的商品图直接编辑。</p>
 
       <GenerateForm
         defaultPrompt={readPromptDraft()}
         pending={generate.isPending}
+        uploading={upload.isPending || createSession.isPending}
+        onFile={(file) => upload.mutate(file, { onSuccess: (asset) => openEditor(asset.id) })}
         onSubmit={(input) =>
           generate.mutate(input, {
             onSuccess: (run) => {
@@ -42,24 +44,20 @@ export default function CreatePage() {
         <p className="text-danger mt-2 text-sm">{errorMessage(generate.error)}</p>
       )}
 
-      <section className="mt-10">
-        <h2 className="text-muted mb-3 text-sm font-medium">上传已有图片</h2>
-        <ImageDropzone
-          onFile={(file) => upload.mutate(file, { onSuccess: (asset) => openEditor(asset.id) })}
-          disabled={upload.isPending || createSession.isPending}
-        />
-        {upload.isError && (
-          <p className="text-danger mt-2 text-sm">{errorMessage(upload.error)}</p>
-        )}
-      </section>
+      {upload.isError && (
+        <p className="text-danger mt-2 text-sm">{errorMessage(upload.error)}</p>
+      )}
 
       <section className="mt-10">
-        <h2 className="text-muted mb-3 text-sm font-medium">历史素材</h2>
+        <h2 className="text-ink mb-4 flex items-center gap-1.5 text-sm font-semibold">
+          <span className="bg-accent size-1.5" aria-hidden />
+          历史素材
+        </h2>
 
         {isPending ? (
           <p className="text-faint text-sm">加载中…</p>
         ) : groups.length === 0 ? (
-          <p className="text-faint text-sm">还没有素材，先描述画面或上传一张图片。</p>
+          <p className="text-faint border-line rounded-card border border-dashed px-6 py-10 text-center text-sm">还没有素材。写一句描述，或把图拖进上面的卡片。</p>
         ) : (
           <AssetLibrary
             groups={groups}

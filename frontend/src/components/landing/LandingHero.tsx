@@ -46,43 +46,33 @@ export default function LandingHero({
 
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="bg-glow absolute inset-x-0 -top-24 h-[560px]" aria-hidden />
-      <div className="bg-grid absolute inset-x-0 -top-24 h-[560px]" aria-hidden />
+      <OverprintDots />
 
-      {/* 容器给到 4xl，让 14 字标题在桌面端稳定单行；正文与输入框各自再收窄 */}
-      <div className="relative mx-auto max-w-4xl px-6 pt-16 pb-14 text-center sm:pt-24">
+      <div className="relative mx-auto max-w-5xl px-6 pt-14 pb-16 sm:pt-20">
         <p
-          className="border-line bg-paper/80 text-muted animate-rise rounded-chip inline-flex items-center gap-2 border px-3.5 py-1.5 text-xs backdrop-blur"
+          className="text-accent-strong animate-rise font-mono text-xs tracking-[0.2em]"
           style={{ animationDelay: '40ms' }}
         >
-          <span className="bg-accent size-1.5" aria-hidden />
-          面向电商运营与内容创作者
+          FOR 电商运营 · 内容创作者
         </p>
 
         <h1
-          className="text-ink animate-rise mt-6 text-[2rem] leading-[1.2] font-semibold tracking-tight text-balance sm:text-[2.7rem] lg:text-[3.25rem]"
+          className="font-display text-print animate-rise mt-5 max-w-3xl text-[2.6rem] leading-[1.08] text-balance sm:text-[3.6rem] lg:text-[4.4rem]"
           style={{ animationDelay: '120ms' }}
         >
-          一句话，交付
-          <span className="relative mx-1 whitespace-nowrap">
-            {/* CJK 字身占满字框，高亮块需覆盖整个字高才像马克笔而非删除线 */}
-            <span
-              className="bg-accent/55 absolute inset-x-[-7px] top-[14%] bottom-[8%] -skew-x-6 rounded-chip"
-              aria-hidden
-            />
-            <span className="relative">可上架</span>
-          </span>
-          的商品物料
+          一句话，
+          <br />
+          交付<span className="mark-print whitespace-nowrap">可上架</span>的商品物料
         </h1>
 
         <p
-          className="text-muted animate-rise mx-auto mt-5 max-w-xl leading-relaxed"
+          className="text-muted animate-rise mt-6 max-w-xl leading-relaxed"
           style={{ animationDelay: '200ms' }}
         >
           描述需求即可从零生成，也可上传商品图继续编辑。抠图、换背景、局部精修、扩图、图层拆分与多尺寸导出，全部由智能体自动编排。
         </p>
 
-        <div className="animate-rise mx-auto mt-9 max-w-3xl" style={{ animationDelay: '280ms' }}>
+        <div className="animate-rise mt-9 max-w-3xl" style={{ animationDelay: '280ms' }}>
           <PromptComposer
             value={prompt}
             onChange={setPrompt}
@@ -95,7 +85,7 @@ export default function LandingHero({
         </div>
 
         <div
-          className="animate-rise mt-5 flex flex-wrap justify-center gap-2"
+          className="animate-rise mt-4 flex max-w-3xl flex-wrap gap-2"
           style={{ animationDelay: '360ms' }}
         >
           {SCENARIOS.map((scenario) => (
@@ -103,7 +93,7 @@ export default function LandingHero({
               key={scenario.label}
               type="button"
               onClick={() => pick(scenario.prompt)}
-              className="border-line bg-paper/70 text-muted hover:border-brand hover:text-brand-strong rounded-chip border px-3.5 py-1.5 text-xs transition-colors"
+              className="border-line bg-paper text-ink hover:border-accent hover:text-accent-strong rounded-chip border px-3 py-1.5 text-xs transition-colors active:translate-px"
             >
               {scenario.label}
             </button>
@@ -111,17 +101,30 @@ export default function LandingHero({
         </div>
 
         <ul
-          className="text-faint animate-rise mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs"
+          className="text-faint animate-rise mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px]"
           style={{ animationDelay: '440ms' }}
         >
-          {FACTS.map((fact) => (
-            <li key={fact} className="flex items-center gap-1.5">
-              <span className="bg-line-strong size-1 rounded-full" aria-hidden />
+          {FACTS.map((fact, index) => (
+            <li key={fact}>
+              <span className="text-accent-strong mr-1.5">0{index + 1}</span>
               {fact}
             </li>
           ))}
         </ul>
       </div>
     </section>
+  )
+}
+
+/** 右上角的套印装饰：粉色实心圆叠一枚蓝色网点圆，multiply 混合出第三色 */
+function OverprintDots() {
+  return (
+    <div
+      className="pointer-events-none absolute top-8 -right-24 hidden size-[460px] md:block lg:right-[-40px]"
+      aria-hidden
+    >
+      <span className="bg-accent absolute top-0 left-0 size-[340px] rounded-full opacity-80 mix-blend-multiply" />
+      <span className="text-brand bg-halftone absolute top-[110px] left-[110px] size-[340px] rounded-full mix-blend-multiply" />
+    </div>
   )
 }

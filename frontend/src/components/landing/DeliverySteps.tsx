@@ -8,13 +8,14 @@ const STEPS = [
 export default function DeliverySteps() {
   return (
     <section className="mx-auto max-w-5xl px-6 pb-16">
-      <ol className="border-line bg-paper rounded-card divide-line grid divide-y border sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+      <p className="text-accent-strong mb-4 font-mono text-xs tracking-[0.2em]">02 / 流程</p>
+      <ol className="border-ink bg-paper rounded-card divide-ink grid divide-y-2 border-2 sm:grid-cols-4 sm:divide-x-2 sm:divide-y-0">
         {STEPS.map((step, index) => (
           <li key={step.title} className="p-6">
             <span className="bg-brand text-paper shadow-print rounded-chip font-mono grid size-7 place-items-center text-xs font-semibold">
               {index + 1}
             </span>
-            <h3 className="text-ink mt-4 text-sm font-medium">{step.title}</h3>
+            <h3 className="text-ink mt-4 text-sm font-semibold">{step.title}</h3>
             <p className="text-muted mt-1.5 text-sm leading-relaxed">{step.desc}</p>
           </li>
         ))}

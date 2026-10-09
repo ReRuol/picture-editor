@@ -3,12 +3,8 @@
  * 均为装饰性内容，对辅助技术隐藏。
  */
 
-const TILES = [
-  'bg-[linear-gradient(145deg,#dbe9ee,#f4f6f3)]',
-  'bg-[linear-gradient(145deg,#e7f0d4,#f4f6f3)]',
-  'bg-[linear-gradient(145deg,#f0e3d3,#f4f6f3)]',
-  'bg-[linear-gradient(145deg,#e0e5dd,#f4f6f3)]',
-]
+// 两种油墨的浅调与叠印出的紫，是 Riso 两色印刷能出的全部色相
+const TILES = ['bg-brand-soft', 'bg-accent-soft', 'bg-[#eadcf0]', 'bg-paper']
 
 /** 一句话生成：四个候选方向，其中一个被选中。 */
 export function CandidatesPreview() {
@@ -18,10 +14,10 @@ export function CandidatesPreview() {
         <div
           key={tone}
           className={`relative grid place-items-center rounded-control ${tone} ${
-            index === 1 ? 'ring-brand ring-2' : 'border-line border'
+            index === 1 ? 'border-brand shadow-print border-2' : 'border-line border'
           }`}
         >
-          <span className="bg-ink/12 h-5 w-4 rounded-chip" />
+          <span className="text-brand bg-halftone h-6 w-5" />
           {index === 1 && (
             <span className="bg-brand absolute top-1 right-1 grid size-3.5 place-items-center">
               <svg viewBox="0 0 24 24" fill="none" className="size-2">
@@ -39,16 +35,16 @@ export function CandidatesPreview() {
 export function SelectionPreview() {
   return (
     <div
-      className="border-line relative aspect-[4/3] h-full max-h-full w-auto overflow-hidden rounded-control border bg-[linear-gradient(160deg,#e4eef1,#f4f6f3)]"
+      className="border-line bg-brand-soft relative aspect-[4/3] h-full max-h-full w-auto overflow-hidden rounded-control border"
       aria-hidden
     >
       <div className="border-brand absolute top-[18%] left-[22%] h-[54%] w-[38%] rounded-control border-2 border-dashed">
-        <span className="bg-ink/12 absolute inset-1.5 rounded-chip" />
+        <span className="bg-accent absolute inset-1.5 opacity-60 mix-blend-multiply" />
         {['-top-1 -left-1', '-top-1 -right-1', '-bottom-1 -left-1', '-bottom-1 -right-1'].map((pos) => (
           <span key={pos} className={`bg-paper border-brand absolute size-2 border-2 ${pos}`} />
         ))}
       </div>
-      <p className="bg-ink absolute bottom-2.5 left-2.5 rounded-chip px-2.5 py-1 text-[10px] text-white">
+      <p className="bg-ink text-paper absolute bottom-2.5 left-2.5 rounded-chip px-2.5 py-1 text-[10px]">
         把背景换成米色亚麻
       </p>
     </div>
@@ -95,11 +91,11 @@ export function ExportsPreview() {
       {RATIOS.map((ratio) => (
         <div key={ratio.label} className="flex flex-col items-center gap-1.5">
           <div
-            className={`border-line grid place-items-center rounded-control border bg-[linear-gradient(150deg,#e4eef1,#f4f6f3)] ${ratio.frame}`}
+            className={`border-line bg-brand-soft grid place-items-center rounded-control border ${ratio.frame}`}
           >
-            <span className="bg-ink/15 h-2/5 w-1/3 rounded-chip" />
+            <span className="text-accent bg-halftone h-2/5 w-1/3" />
           </div>
-          <span className="text-faint text-[10px]">{ratio.label}</span>
+          <span className="text-faint font-mono text-[10px]">{ratio.label}</span>
         </div>
       ))}
     </div>

@@ -34,7 +34,7 @@ export default function CandidatesPage() {
       <Centered title="生成失败" hint={error ?? '未知原因'}>
         <Link
           to="/create"
-          className="bg-ink hover:bg-dark rounded-control mt-5 px-4 py-2 text-sm font-medium text-white"
+          className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control mt-5 px-4 py-2 text-sm font-semibold transition-[background-color,translate] active:translate-px disabled:opacity-40 disabled:shadow-none"
         >
           返回重试
         </Link>
@@ -50,7 +50,7 @@ export default function CandidatesPage() {
     <div className="mx-auto max-w-5xl px-8 py-10">
       <header className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-ink text-2xl font-semibold tracking-tight">选出一张</h1>
+          <h1 className="font-display text-print text-4xl">选出一张</h1>
           <p className="text-muted mt-1 text-sm">
             挑一张满意的进入编辑，其余候选图会留在会话图片墙随时切回。
           </p>
@@ -59,7 +59,7 @@ export default function CandidatesPage() {
           type="button"
           disabled={!picked || createSession.isPending}
           onClick={adopt}
-          className="bg-ink hover:bg-dark rounded-control shrink-0 px-4 py-2 text-sm font-medium text-white transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
+          className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control shrink-0 px-5 py-2 text-sm font-semibold transition-[background-color,translate] duration-150 active:translate-px disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none disabled:active:translate-none"
         >
           {createSession.isPending ? '打开中…' : picked ? '进入编辑' : '先点选一张'}
         </button>
@@ -96,10 +96,8 @@ function Candidate({
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      className={`rounded-panel group relative block overflow-hidden border-2 bg-white transition-all duration-200 ${
-        selected
-          ? 'border-brand shadow-lift'
-          : 'border-line hover:border-brand hover:-translate-y-0.5 hover:shadow-lift'
+      className={`rounded-panel bg-stage group relative block overflow-hidden border-2 transition-[border-color,box-shadow] duration-200 ${
+        selected ? 'border-brand shadow-card' : 'border-line hover:border-ink'
       }`}
     >
       <img
@@ -108,7 +106,7 @@ function Candidate({
         loading="lazy"
         className="block max-h-[52vh] w-full object-contain transition-transform duration-300 group-hover:scale-[1.01]"
       />
-      <span className="text-muted bg-paper/90 absolute top-2 left-2 rounded-chip px-2 py-0.5 text-xs font-medium backdrop-blur">
+      <span className="bg-ink text-paper absolute top-2 left-2 rounded-chip px-2 py-0.5 font-mono text-xs">
         {index + 1}
       </span>
       {selected && (
@@ -123,8 +121,15 @@ function Candidate({
 function Progress({ percent, stage }: { percent: number; stage: string }) {
   return (
     <Centered title="正在生成" hint={stage || '任务已提交，正在排队'}>
-      <ProgressBar value={percent} tone="accent" className="mt-6 h-1 w-64" />
-      <p className="text-faint mt-2 text-xs tabular-nums">{percent}%</p>
+      {/* 油墨一层层印上去：粉色网点按进度从下往上铺满方框 */}
+      <div className="border-ink bg-paper relative mt-7 size-40 overflow-hidden border-2" aria-hidden>
+        <span
+          className="text-accent bg-halftone absolute inset-x-0 bottom-0 transition-[height] duration-500"
+          style={{ height: `${Math.max(percent, 4)}%` }}
+        />
+      </div>
+      <ProgressBar value={percent} tone="accent" className="sr-only" />
+      <p className="text-ink mt-3 font-mono text-sm">{percent}%</p>
     </Centered>
   )
 }
@@ -140,7 +145,7 @@ function Centered({
 }) {
   return (
     <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-      <h1 className="text-ink text-xl font-semibold">{title}</h1>
+      <h1 className="font-display text-print text-3xl">{title}</h1>
       <p className="text-muted mt-1 max-w-md text-sm">{hint}</p>
       {children}
     </div>

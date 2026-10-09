@@ -27,10 +27,10 @@ const CAPABILITIES: { title: string; desc: string; preview: ReactNode }[] = [
 
 export default function CapabilityShowcase() {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
+    <section className="mx-auto max-w-5xl px-6 pt-8 pb-16">
       <header className="max-w-xl">
-        <p className="text-brand-strong text-sm font-medium">能力</p>
-        <h2 className="text-ink mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+        <p className="text-accent-strong font-mono text-xs tracking-[0.2em]">01 / 能力</p>
+        <h2 className="font-display text-ink mt-3 text-3xl sm:text-4xl">
           不只是生成一张好看的图
         </h2>
         <p className="text-muted mt-3 leading-relaxed">
@@ -42,12 +42,12 @@ export default function CapabilityShowcase() {
         {CAPABILITIES.map((item) => (
           <article
             key={item.title}
-            className="border-line bg-paper rounded-card hover:shadow-lift border p-6 transition-shadow"
+            className="border-ink bg-paper rounded-card hover:shadow-card border-2 p-6 transition-shadow duration-200"
           >
-            <div className="bg-soft border-line/70 mb-6 flex h-44 items-center justify-center overflow-hidden rounded-control border px-5 py-4">
+            <div className="bg-canvas border-line mb-6 flex h-44 items-center justify-center overflow-hidden rounded-control border px-5 py-4">
               {item.preview}
             </div>
-            <h3 className="text-ink font-medium">{item.title}</h3>
+            <h3 className="text-ink text-lg font-semibold">{item.title}</h3>
             <p className="text-muted mt-2 text-sm leading-relaxed">{item.desc}</p>
           </article>
         ))}

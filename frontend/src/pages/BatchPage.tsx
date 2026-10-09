@@ -58,13 +58,15 @@ function Compose() {
 
   return (
     <div className="mx-auto max-w-5xl px-8 py-10">
-      <h1 className="text-ink text-2xl font-semibold tracking-tight">批量</h1>
+      <h1 className="font-display text-print text-4xl">批量</h1>
       <p className="text-muted mt-1 mb-8 text-sm">
         对多张图走同一套像素处理：去背景、换背景、调色、超分、扩图、投放尺寸。
       </p>
 
       <section className="mb-8">
-        <h2 className="text-ink mb-3 text-sm font-medium">选择图片</h2>
+        <h2 className="text-ink mb-3 flex items-center gap-1.5 text-sm font-semibold">
+          <span className="bg-accent size-1.5" aria-hidden />
+          选择图片</h2>
         <ImageDropzone
           multiple
           disabled={upload.isPending || assets.length >= MAX_IMAGES}
@@ -83,7 +85,7 @@ function Compose() {
                 <button
                   type="button"
                   onClick={() => setAssets((current) => current.filter((item) => item.id !== asset.id))}
-                  className="bg-ink/70 absolute -top-1 -right-1 rounded-chip grid size-5 place-items-center text-[10px] text-white"
+                  className="bg-ink text-paper absolute -top-1.5 -right-1.5 rounded-chip grid size-5 place-items-center text-[10px]"
                   aria-label="移除"
                 >
                   ×
@@ -119,17 +121,20 @@ function Compose() {
           type="button"
           disabled={Boolean(blocked) || create.isPending}
           onClick={start}
-          className="bg-ink hover:bg-dark rounded-control px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+          className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control px-5 py-2 text-sm font-semibold transition-[background-color,translate] active:translate-px disabled:opacity-40 disabled:shadow-none disabled:active:translate-none"
         >
           {create.isPending ? '提交中…' : '开始处理'}
         </button>
-        {blocked && <p className="text-faint text-xs">{blocked}</p>}
+        {/* 还差什么用粉色写出来，和按钮本身拉开，不会被当成按钮的一部分 */}
+        {blocked && <p className="text-accent-strong text-xs">还差一步：{blocked}</p>}
         {create.isError && <p className="text-danger text-xs">{errorMessage(create.error)}</p>}
       </div>
 
       {history.length > 0 && (
         <section className="mt-12">
-          <h2 className="text-ink mb-3 text-sm font-medium">最近任务</h2>
+          <h2 className="text-ink mb-3 flex items-center gap-1.5 text-sm font-semibold">
+          <span className="bg-accent size-1.5" aria-hidden />
+          最近任务</h2>
           <ul className="space-y-2">
             {history.map((item) => (
               <li key={item.run.id}>
@@ -187,7 +192,7 @@ function Watch({ runId }: { runId: string }) {
     <div className="mx-auto max-w-5xl px-8 py-10">
       <div className="mb-8 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-ink text-2xl font-semibold tracking-tight">批量进度</h1>
+          <h1 className="font-display text-print text-4xl">批量进度</h1>
           <p className="text-muted mt-1 text-sm">
             {live.stage || '处理中'}
             {done ? '' : ` · ${live.progress}%`}
@@ -207,7 +212,7 @@ function Watch({ runId }: { runId: string }) {
             type="button"
             disabled={!done || succeeded === 0 || pack.isPending}
             onClick={download}
-            className="bg-ink hover:bg-dark rounded-control px-3.5 py-2 text-xs font-medium text-white disabled:opacity-40"
+            className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control px-3.5 py-2 text-xs font-semibold transition-[background-color,translate] active:translate-px disabled:opacity-40 disabled:shadow-none"
           >
             {pack.isPending ? '打包中…' : '打包下载'}
           </button>
@@ -283,12 +288,19 @@ function Pipeline({
 
   return (
     <section>
-      <h2 className="text-ink mb-3 text-sm font-medium">处理步骤</h2>
+      <h2 className="text-ink mb-3 flex items-center gap-1.5 text-sm font-semibold">
+          <span className="bg-accent size-1.5" aria-hidden />
+          处理步骤</h2>
       <ul className="grid gap-3 sm:grid-cols-2">
         {BATCH_STEPS.map((step) => {
           const on = draft.selected.includes(step.id)
           return (
-            <li key={step.id} className="border-line bg-paper rounded-card border p-4">
+            <li
+              key={step.id}
+              className={`bg-paper rounded-card border-2 p-4 transition-[border-color,box-shadow] duration-150 ${
+                on ? 'border-brand shadow-print' : 'border-line hover:border-line-strong'
+              }`}
+            >
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
@@ -297,7 +309,7 @@ function Pipeline({
                   className="mt-0.5"
                 />
                 <span>
-                  <span className="text-ink block text-sm font-medium">{step.label}</span>
+                  <span className="text-ink block text-sm font-semibold">{step.label}</span>
                   <span className="text-faint block text-xs">{step.hint}</span>
                 </span>
               </label>
@@ -336,7 +348,7 @@ function Pipeline({
                       type="button"
                       onClick={() => onChange({ ...draft, scale })}
                       className={`rounded-control px-3 py-1.5 text-xs ${
-                        draft.scale === scale ? 'bg-ink text-white' : 'border-line text-muted border'
+                        draft.scale === scale ? 'bg-brand text-paper' : 'border-line text-muted border'
                       }`}
                     >
                       {scale} 倍
@@ -353,7 +365,7 @@ function Pipeline({
                       onClick={() => onChange({ ...draft, expandRatio: ratio })}
                       className={`rounded-control px-3 py-1.5 text-xs ${
                         draft.expandRatio === ratio
-                          ? 'bg-ink text-white'
+                          ? 'bg-brand text-paper'
                           : 'border-line text-muted border'
                       }`}
                     >
@@ -371,7 +383,7 @@ function Pipeline({
                       onClick={() => toggleDelivery(ratio)}
                       className={`rounded-control px-3 py-1.5 text-xs ${
                         draft.delivery.includes(ratio)
-                          ? 'bg-ink text-white'
+                          ? 'bg-brand text-paper'
                           : 'border-line text-muted border'
                       }`}
                     >

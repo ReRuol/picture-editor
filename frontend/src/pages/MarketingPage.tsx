@@ -32,9 +32,13 @@ function Picker() {
   const open = (id: string) => navigate(`/marketing/${id}`)
 
   return (
-    <div className="mx-auto max-w-4xl px-8 py-10">
+    <div className="mx-auto max-w-5xl px-8 py-10">
       <PageTitle />
-      <h2 className="text-muted mb-3 text-sm font-medium">选择会话</h2>
+      <Deliverables />
+      <h2 className="text-ink mb-4 flex items-center gap-1.5 text-sm font-semibold">
+        <span className="bg-accent size-1.5" aria-hidden />
+        选一个会话开始
+      </h2>
       {isPending ? (
         <p className="text-faint text-sm">加载中…</p>
       ) : groups.length === 0 ? (
@@ -193,7 +197,7 @@ function Workspace({ sessionId }: { sessionId: string }) {
             type="button"
             disabled={tools.busy}
             onClick={() => tools.invoke('prepare_delivery_sizes')}
-            className="bg-ink hover:bg-dark rounded-control px-3.5 py-2 text-xs font-medium text-white disabled:opacity-40"
+            className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control px-3.5 py-2 text-xs font-semibold transition-[background-color,translate] active:translate-px disabled:opacity-40 disabled:shadow-none"
           >
             {deliveryRunning() ? '生成中…' : '生成 1:1 / 4:5 / 9:16'}
           </button>
@@ -248,7 +252,7 @@ function PageTitle({ action }: { action?: ReactNode }) {
   return (
     <header className="mb-8">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-ink text-2xl font-semibold tracking-tight">导出物料</h1>
+        <h1 className="font-display text-print text-4xl">导出物料</h1>
         {action}
       </div>
       <p className="text-muted mt-1 max-w-xl text-sm">
@@ -258,10 +262,50 @@ function PageTitle({ action }: { action?: ReactNode }) {
   )
 }
 
+/** 还没选会话时先说清楚能拿到什么：四类营销图 + 三个投放尺寸 */
+function Deliverables() {
+  return (
+    <div className="border-ink bg-paper rounded-card mb-10 grid border-2 sm:grid-cols-[3fr_2fr]">
+      <div className="border-ink p-5 sm:border-r-2">
+        <p className="text-accent-strong font-mono text-[11px] tracking-[0.2em]">A / 营销图</p>
+        <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+          {MARKETING_KINDS.map((kind) => (
+            <li key={kind.id}>
+              <p className="text-ink text-sm font-semibold">{kind.label}</p>
+              <p className="text-faint text-xs">{kind.hint}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="border-ink border-t-2 p-5 sm:border-t-0">
+        <p className="text-accent-strong font-mono text-[11px] tracking-[0.2em]">B / 投放尺寸</p>
+        <div className="mt-3 flex items-end gap-4">
+          {DELIVERY_RATIOS.map((ratio) => {
+            const [w, h] = ratio.label.split(':').map(Number)
+            return (
+              <div key={ratio.value} className="flex flex-col items-center gap-1.5">
+                <span
+                  className="text-brand bg-halftone border-brand block border-2"
+                  style={{ width: 22 * Math.sqrt(w / h) * 2, height: 22 * Math.sqrt(h / w) * 2 }}
+                />
+                <span className="text-ink font-mono text-[11px]">{ratio.label}</span>
+                <span className="text-faint font-mono text-[10px]">{ratio.size}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function SectionHead({ title, hint }: { title: string; hint: string }) {
   return (
     <div className="mb-3">
-      <h2 className="text-ink text-sm font-medium">{title}</h2>
+      <h2 className="text-ink flex items-center gap-1.5 text-sm font-semibold">
+        <span className="bg-accent size-1.5" aria-hidden />
+        {title}
+      </h2>
       <p className="text-faint mt-0.5 text-xs">{hint}</p>
     </div>
   )
@@ -301,14 +345,16 @@ function KindCard({
   onGenerate: () => void
 }) {
   return (
-    <div className="border-line bg-paper flex flex-col rounded-card border p-4">
-      <p className="text-ink text-sm font-medium">{label}</p>
+    <div className="border-line bg-paper hover:border-ink flex flex-col rounded-card border p-4 transition-colors">
+      <p className="text-ink text-sm font-semibold">{label}</p>
       <p className="text-faint mt-1 min-h-8 flex-1 text-xs leading-relaxed">{hint}</p>
       <button
         type="button"
         disabled={disabled}
         onClick={onGenerate}
-        className="border-line text-ink hover:bg-soft rounded-control mt-3 px-3 py-1.5 text-xs font-medium disabled:opacity-40"
+        className={`rounded-control mt-3 px-3 py-1.5 text-xs font-semibold disabled:opacity-40 ${
+          running ? 'bg-accent text-ink' : 'border-brand text-brand hover:bg-brand hover:text-paper border'
+        }`}
       >
         {running ? '生成中…' : '生成'}
       </button>
@@ -358,7 +404,7 @@ function PackList({
             type="button"
             disabled={disabled || selected.length === 0}
             onClick={onDownload}
-            className="bg-ink hover:bg-dark rounded-control px-3.5 py-2 text-xs font-medium text-white disabled:opacity-40"
+            className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control px-3.5 py-2 text-xs font-semibold transition-[background-color,translate] active:translate-px disabled:opacity-40 disabled:shadow-none"
           >
             {packing ? '处理中…' : `打包 ${selected.length} 张`}
           </button>

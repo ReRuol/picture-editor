@@ -58,19 +58,26 @@ export default function AuthPage() {
 
   return (
     <div className="relative isolate flex min-h-screen items-center justify-center px-6 py-12">
-      <div className="bg-glow absolute inset-x-0 top-0 h-[420px]" aria-hidden />
+      {/* 与首页同一组套印圆点，压在卡片后面 */}
+      <div className="pointer-events-none absolute top-1/2 left-1/2 size-[520px] translate-x-[-8%] translate-y-[-62%]" aria-hidden>
+        <span className="bg-accent absolute top-0 left-0 size-[360px] rounded-full opacity-70 mix-blend-multiply" />
+        <span className="text-brand bg-halftone absolute top-[120px] left-[140px] size-[360px] rounded-full opacity-80 mix-blend-multiply" />
+      </div>
 
       <div className="relative w-full max-w-sm">
-        <Link to="/" className="text-muted hover:text-ink mb-6 inline-flex items-center gap-2 text-sm">
-          <span aria-hidden>←</span> 返回首页
-        </Link>
+        <div className="border-ink bg-paper rounded-panel shadow-card border-2 p-8">
+          <div className="flex items-center justify-between">
+            <Link to="/" aria-label="返回首页">
+              <BrandMark size="sm">
+                <span className="text-ink text-sm font-semibold">AI 修图智能体</span>
+              </BrandMark>
+            </Link>
+            <Link to="/" className="text-faint hover:text-ink text-xs transition-colors">
+              ← 首页
+            </Link>
+          </div>
 
-        <div className="border-line bg-paper rounded-panel shadow-panel border p-8">
-          <BrandMark size="sm">
-            <span className="text-ink text-sm font-semibold">AI 修图智能体</span>
-          </BrandMark>
-
-          <h1 className="text-ink mt-6 text-2xl font-semibold tracking-tight">{copy.title}</h1>
+          <h1 className="font-display text-print mt-7 text-4xl">{copy.title}</h1>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             <Field
@@ -96,7 +103,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={action.isPending}
-              className="bg-ink hover:bg-dark rounded-control w-full py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50"
+              className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control w-full py-2.5 text-sm font-semibold transition-[background-color,translate] active:translate-px disabled:opacity-50 disabled:shadow-none"
             >
               {action.isPending ? '处理中…' : copy.submit}
             </button>
@@ -105,7 +112,7 @@ export default function AuthPage() {
           <button
             type="button"
             onClick={switchMode}
-            className="text-muted hover:text-brand-strong mt-5 text-sm transition-colors"
+            className="text-muted hover:text-accent-strong mt-5 text-sm transition-colors"
           >
             {copy.switchHint}
           </button>

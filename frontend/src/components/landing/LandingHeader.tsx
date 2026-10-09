@@ -4,7 +4,7 @@ import BrandMark from '@/components/BrandMark'
 
 export default function LandingHeader({ account }: { account: string | null }) {
   return (
-    <header className="border-line/70 bg-canvas/80 sticky top-0 z-10 border-b backdrop-blur">
+    <header className="border-line bg-canvas sticky top-0 z-10 border-b">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3.5">
         <Link to="/" aria-label="AI 修图智能体首页">
           <BrandMark size="sm">

@@ -45,7 +45,7 @@ export default function PromptComposer({
         event.preventDefault()
         onSubmit()
       }}
-      className="border-line bg-paper shadow-panel rounded-panel focus-within:border-brand relative border p-2 text-left transition-colors"
+      className="border-ink bg-paper shadow-card rounded-panel focus-within:border-brand relative border-2 p-2 text-left transition-colors"
     >
       <textarea
         ref={inputRef}
@@ -74,10 +74,10 @@ export default function PromptComposer({
         </button>
 
         <div className="flex items-center gap-3">
-          <span className="text-faint hidden text-xs sm:block">Enter 发送 · Shift + Enter 换行</span>
+          <span className="text-faint hidden font-mono text-[11px] sm:block">Enter 发送 · Shift+Enter 换行</span>
           <button
             type="submit"
-            className="bg-ink hover:bg-dark rounded-control flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white transition-colors"
+            className="bg-brand hover:bg-brand-strong text-paper shadow-print rounded-control flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-[background-color,translate] active:translate-px"
           >
             {submitLabel}
             <SubmitIcon />

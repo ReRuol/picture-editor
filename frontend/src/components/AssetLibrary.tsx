@@ -14,7 +14,8 @@ export default function AssetLibrary({
   onOpenAsset: (assetId: string) => void
 }) {
   return (
-    <ul className="space-y-3">
+    // 网格卡片：只有一条历史时也是一张缩略图，而不是一条拉满整行的列表
+    <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {groups.map((group) => (
         <LibraryGroupCard
           key={group.session_id ?? 'orphan'}
@@ -43,36 +44,36 @@ function LibraryGroupCard({
   }
 
   return (
-    <li className="border-line bg-paper overflow-hidden rounded-card border">
-      <div className="flex items-stretch">
+    <>
+    <li className="group">
+      <button
+        type="button"
+        onClick={openGroup}
+        className="border-line bg-paper rounded-card group-hover:border-ink group-hover:shadow-card block w-full overflow-hidden border text-left transition-[border-color,box-shadow] duration-200"
+      >
+        <span className="bg-stage block aspect-square">
+          <img src={group.cover.url} alt="" className="size-full object-contain" />
+        </span>
+        <span className="border-line block border-t px-3 py-2.5">
+          <span className="text-ink block truncate text-sm font-semibold">{group.title}</span>
+          <span className="text-faint block font-mono text-[10px]">
+            {group.assets.length} 张 · {formatDateTime(group.updated_at)}
+          </span>
+        </span>
+      </button>
+      {group.assets.length > 1 && (
         <button
           type="button"
-          onClick={openGroup}
-          className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          className="text-muted hover:text-brand mt-1.5 text-xs"
         >
-          <span className="bg-canvas border-line size-14 shrink-0 overflow-hidden rounded-control border">
-            <img src={group.cover.url} alt="" className="size-full object-cover" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="text-ink block truncate text-sm font-medium">{group.title}</span>
-            <span className="text-faint block text-[11px] tabular-nums">
-              {group.assets.length} 张 · {formatDateTime(group.updated_at)}
-            </span>
-          </span>
+          {open ? '收起全部' : `看全部 ${group.assets.length} 张`}
         </button>
-        {group.assets.length > 1 && (
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            className="text-muted hover:text-ink hover:bg-soft px-3 text-xs font-medium"
-          >
-            {open ? '收起' : '展开'}
-          </button>
-        )}
-      </div>
+      )}
+    </li>
       {open && (
-        <div className="border-line grid grid-cols-2 gap-3 border-t p-3 sm:grid-cols-3 lg:grid-cols-4">
+        <li className="border-line bg-paper rounded-card col-span-full grid grid-cols-2 gap-3 border p-3 sm:grid-cols-3 lg:grid-cols-4">
           {group.assets.map((asset) => (
             <AssetCard
               key={asset.id}
@@ -82,8 +83,8 @@ function LibraryGroupCard({
               }
             />
           ))}
-        </div>
+        </li>
       )}
-    </li>
+    </>
   )
 }
