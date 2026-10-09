@@ -10,7 +10,13 @@ from app.agent.llm import PlannerUnavailable, planner
 from app.config import get_settings
 from app.providers import EditRequest, GenerateRequest
 from app.providers.base import ProviderError
-from app.providers.volcengine import VolcengineImageProvider, fit_size
+from app.providers.volcengine import (
+    SEEDREAM_5,
+    SEEDREAM_5_PRO,
+    VolcengineImageProvider,
+    fit_size,
+    limits_for,
+)
 
 
 def _png(width: int = 64, height: int = 48) -> bytes:
@@ -124,5 +130,42 @@ def test_planner_uses_volcengine_when_selected(monkeypatch):
         bound = planner()
         assert bound.bound.openai_api_base == settings.volcengine_base_url
         assert bound.bound.model_name == settings.volcengine_planner_model
+    finally:
+        planner.cache_clear()
+
+
+def test_seedream_5_limits_follow_model_id(monkeypatch):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "volcengine_min_pixels", 0)
+    monkeypatch.setattr(settings, "volcengine_max_pixels", 0)
+    assert limits_for("doubao-seedream-5-0-260128") == SEEDREAM_5
+    assert limits_for("doubao-seedream-5-0-pro-260628") == SEEDREAM_5_PRO
+
+    # 5.0 下限 2560*1440，1080 方图必须放大才不会被接口拒绝
+    w, h = fit_size(1080, 1080, SEEDREAM_5)
+    assert w * h >= 2560 * 1440 and w == h
+    # pro 上限约 462 万像素，2 倍超分要被压回来
+    w, h = fit_size(2400, 3000, SEEDREAM_5_PRO)
+    assert w * h <= SEEDREAM_5_PRO.max_pixels
+    assert abs(w / h - 0.8) < 0.01
+
+    monkeypatch.setattr(settings, "volcengine_min_pixels", 1000)
+    assert limits_for("ep-20260101-xxxx").min_pixels == 1000
+
+
+def test_planner_uses_deepseek_when_selected(monkeypatch):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "planner_provider", "deepseek")
+    monkeypatch.setattr(settings, "deepseek_api_key", "")
+    planner.cache_clear()
+    try:
+        with pytest.raises(PlannerUnavailable, match="DEEPSEEK_API_KEY"):
+            planner()
+
+        monkeypatch.setattr(settings, "deepseek_api_key", "test-key")
+        planner.cache_clear()
+        bound = planner()
+        assert bound.bound.openai_api_base == settings.deepseek_base_url
+        assert bound.bound.model_name == settings.deepseek_planner_model
     finally:
         planner.cache_clear()

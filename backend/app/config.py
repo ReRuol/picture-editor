@@ -38,13 +38,20 @@ class Settings(BaseSettings):
     text_to_image_model: str = "qwen-image-3.0-pro"
     image_edit_model: str = "qwen-image-edit-max"
     planner_model: str = "qwen-plus"
-    # 规划模型平台：dashscope | volcengine，与 image_provider 相互独立
+    # 规划模型平台：dashscope | volcengine | deepseek，与 image_provider 相互独立
     planner_provider: str = "dashscope"
     # 火山引擎方舟；模型名也可填控制台创建的推理接入点 ID（ep-xxx）
     volcengine_api_key: str = ""
     volcengine_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
     volcengine_image_model: str = "doubao-seedream-4-0-250828"
     volcengine_planner_model: str = "doubao-seed-1-6-250615"
+    # 画幅像素上下限，0 表示按模型 ID 自动取；用接入点 ID（ep-xxx）时需要手填
+    volcengine_min_pixels: int = 0
+    volcengine_max_pixels: int = 0
+    # DeepSeek 官方接口，只做规划（纯文本 + 工具调用）
+    deepseek_api_key: str = ""
+    deepseek_base_url: str = "https://api.deepseek.com"
+    deepseek_planner_model: str = "deepseek-chat"
     # auto：有 rembg 用 rembg，否则四角抠图；测试强制 corner 以免下载模型
     matting_provider: str = "auto"
     # auto：有 rapidocr 则识别文字层；none 跳过；测试强制 none

@@ -2,6 +2,7 @@ import asyncio
 import base64
 import io
 import math
+from dataclasses import dataclass
 
 import httpx
 from PIL import Image
@@ -17,9 +18,37 @@ from app.providers.base import (
 
 _GENERATE_PATH = "/images/generations"
 _TIMEOUT = 180.0
+
+
+@dataclass(frozen=True)
+class SizeLimits:
+    min_pixels: int
+    max_pixels: int
+    max_edge: int = 4096
+
+
 # Seedream 4.0：总像素 [1280*720, 4096*4096]，单边不超过 4096
-_MIN_PIXELS = 1280 * 720
-_MAX_EDGE = 4096
+SEEDREAM_4 = SizeLimits(1280 * 720, 4096 * 4096)
+# 5.0 lite（doubao-seedream-5-0-260128）：总像素 [2560*1440, 4096*4096]，宽高比 1/16~16
+SEEDREAM_5 = SizeLimits(2560 * 1440, 4096 * 4096)
+# 5.0 pro：官方页面抓不到正文，这组数来自第三方实测，接上真 key 后要再核一次
+SEEDREAM_5_PRO = SizeLimits(921_600, 4_624_220)
+
+
+def limits_for(model: str) -> SizeLimits:
+    """按模型 ID 取画幅限制。接入点 ID（ep-xxx）看不出版本，靠 VOLCENGINE_MIN/MAX_PIXELS 覆盖。"""
+    settings = get_settings()
+    if "seedream-5-0-pro" in model:
+        base = SEEDREAM_5_PRO
+    elif "seedream-5" in model:
+        base = SEEDREAM_5
+    else:
+        base = SEEDREAM_4
+    return SizeLimits(
+        settings.volcengine_min_pixels or base.min_pixels,
+        settings.volcengine_max_pixels or base.max_pixels,
+        base.max_edge,
+    )
 
 
 class VolcengineImageProvider(ImageProvider):
@@ -36,6 +65,7 @@ class VolcengineImageProvider(ImageProvider):
         if not settings.volcengine_api_key:
             raise ProviderError("未配置 VOLCENGINE_API_KEY")
         self._model = settings.volcengine_image_model
+        self._limits = limits_for(self._model)
         self._client = httpx.AsyncClient(
             base_url=settings.volcengine_base_url,
             headers={"Authorization": f"Bearer {settings.volcengine_api_key}"},
@@ -47,7 +77,7 @@ class VolcengineImageProvider(ImageProvider):
     ) -> list[bytes]:
         payload = self._payload(
             _with_negative(request.prompt, request.negative_prompt),
-            fit_size(request.width, request.height),
+            fit_size(request.width, request.height, self._limits),
             [_data_uri(raw) for raw in request.references],
         )
         return await self._run(payload, request.count, on_progress)
@@ -56,10 +86,10 @@ class VolcengineImageProvider(ImageProvider):
         self, request: EditRequest, on_progress: ProgressCallback | None = None
     ) -> list[bytes]:
         if request.width and request.height:
-            size = fit_size(request.width, request.height)
+            size = fit_size(request.width, request.height, self._limits)
         else:
             source = Image.open(io.BytesIO(request.image))
-            size = fit_size(source.width, source.height)
+            size = fit_size(source.width, source.height, self._limits)
         payload = self._payload(
             _with_negative(request.prompt, request.negative_prompt),
             size,
@@ -148,16 +178,19 @@ def _with_negative(prompt: str, negative: str | None) -> str:
     return f"{prompt}\n避免：{negative}" if negative else prompt
 
 
-def fit_size(width: int, height: int) -> tuple[int, int]:
-    """保持比例，把画幅缩放到 Seedream 允许的像素范围内。"""
+def fit_size(width: int, height: int, limits: SizeLimits = SEEDREAM_4) -> tuple[int, int]:
+    """保持比例，把画幅缩放到模型允许的像素范围内。"""
+    pixels = width * height
     scale = 1.0
-    if width * height < _MIN_PIXELS:
-        scale = math.sqrt(_MIN_PIXELS / (width * height))
+    if pixels < limits.min_pixels:
+        scale = math.sqrt(limits.min_pixels / pixels)
+    elif pixels > limits.max_pixels:
+        scale = math.sqrt(limits.max_pixels / pixels)
     long_edge = max(width, height) * scale
-    if long_edge > _MAX_EDGE:
-        scale *= _MAX_EDGE / long_edge
-    # 向上取整保住最小像素，再夹住浮点误差可能顶出的上限
-    return (
-        min(_MAX_EDGE, max(1, math.ceil(width * scale))),
-        min(_MAX_EDGE, max(1, math.ceil(height * scale))),
-    )
+    if long_edge > limits.max_edge:
+        scale *= limits.max_edge / long_edge
+    # 向上取整保住最小像素；若因此顶出像素上限，改向下取整
+    w, h = math.ceil(width * scale), math.ceil(height * scale)
+    if w * h > limits.max_pixels:
+        w, h = math.floor(width * scale), math.floor(height * scale)
+    return min(limits.max_edge, max(1, w)), min(limits.max_edge, max(1, h))

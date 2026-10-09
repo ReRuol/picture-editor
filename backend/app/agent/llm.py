@@ -50,6 +50,15 @@ def planner():
             base_url=f"{settings.dashscope_base_url}{_COMPATIBLE_PATH}",
             temperature=0,
         )
+    elif settings.planner_provider == "deepseek":
+        if not settings.deepseek_api_key:
+            raise PlannerUnavailable("未配置 DEEPSEEK_API_KEY，对话指令不可用")
+        model = ChatOpenAI(
+            model=settings.deepseek_planner_model,
+            api_key=settings.deepseek_api_key,
+            base_url=settings.deepseek_base_url,
+            temperature=0,
+        )
     else:
         raise PlannerUnavailable(f"未知的 PLANNER_PROVIDER：{settings.planner_provider}")
     return model.bind_tools([_schema_of(spec) for spec in SPECS])
