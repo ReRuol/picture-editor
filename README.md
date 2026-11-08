@@ -1,247 +1,221 @@
-# AI 修图智能体
+# picture-editor
 
-> 本项目为教学项目，提供完整文字教程 + 简历写法 + 面试题解 + 答疑服务，帮你提升项目能力，给简历增加亮点！
->
-> ⭐️ 加入项目系列学习：[加入编程导航](https://www.codefather.cn/vip)
+**用对话完成图片创作，把商品素材整理成可交付的视觉物料。**
 
-## 一、项目介绍
+picture-editor 是面向电商运营与内容创作者的 AI 图片工作台。输入描述生成候选图，或上传已有商品图进入编辑器；在同一个会话中完成抠图、换背景、局部修改、图层调整、营销图生成和多尺寸导出。
 
-这是一套以 **AI Agent 驱动的图片编辑** 为核心的全栈项目教程，基于 Python 3.13 + FastAPI + LangChain + LangGraph + React 19 + Konva。你只需要输入一句话，AI 就能自动规划修图步骤、调用 21 种编辑工具帮你完成专业级修图，从文生图到抠图调色、区域编辑、图层拆分，全部自动搞定。
+[界面预览](#界面预览) · [功能](#功能) · [架构](#架构) · [运行配置](#运行配置)
 
-![](https://pic.yupi.icu/pine/image-20260901150955859.png)
+![picture-editor 首页：蓝粉套印标题、商品创作入口与能力展示](assets/screenshots/overview.png)
 
-### 为什么做这个项目？
-1）赛道火热：AI 修图和 AI 生图是目前最热门的 AI 应用方向之一，各大厂和创业公司都在布局。掌握 AI 图像处理和智能体开发，求职时非常有竞争力。
+## 功能
 
-2）技术含量高：这个项目涉及的技术面很广，从后端的 LangChain 模型接入、LangGraph 智能体、异步任务队列、对象存储，到前端的 Canvas 画布引擎、图层系统、选区交互，再到 AI 模型的文生图、语义分割、图像编辑，远不是增删改查能比的。
+| 能力 | 可以完成的工作 |
+| --- | --- |
+| 图片生成 | 输入画面描述，选择比例与数量，生成候选图后进入编辑 |
+| 对话式修图 | 结合用户指令、图层摘要和当前画布预览规划操作；DeepSeek 路径接入视觉输入 |
+| 图层画布 | 平移、缩放、旋转、翻转、调整透明度与层级，管理图层显隐和文字内容 |
+| 主体与背景 | 本地去背景，将主体、背景或选中的物体分离成独立图层 |
+| 区域编辑 | 通过点选或笔刷确定区域，执行局部消除、替换、改色或材质调整 |
+| 色彩与清晰度 | 调整明暗、对比度、冷暖、饱和度、锐化等参数，或调用图像模型提高分辨率 |
+| 画幅扩展 | 按描述延伸画面，适配新的构图比例 |
+| 电商营销图 | 以当前画布为基础生成商品主图、场景氛围图、模特展示图和促销海报 |
+| 批量处理 | 最多选择 20 张图片，组合去背景、换背景、调色、超分、扩图与尺寸适配 |
+| 物料交付 | 输出 1:1、4:5、9:16 等比例，将选中的图片和清单打包为 ZIP |
 
-3）全栈实战：一个项目同时练 Python 后端和 React 前端，后端重点在 Agent 架构和图像处理管线，前端重点在画布引擎和复杂交互，两端都有大量值得写进简历的技术点。
+界面按钮与智能体调用同一套工具。编辑结果、会话图片墙、图层文档和历史记录统一保存，支持撤销、重做和继续编辑。再次打开同一素材会复用已有会话。
 
+## 界面预览
 
-### 8 大核心能力
+当前界面采用蓝粉双色套印、纸张底色与网点纹理。工作台将创作、精修、批量和导出分别组织，编辑器内的对话栏与属性面板可以收起，为画布留出空间。
 
-1）AI 文生图，输入提示词就能出图
+以下截图来自当前前端界面，使用示例商品素材与展示数据；图中的商品插画不代表模型生成效果。
 
-在创作页输入一段提示词，AI 自动生成四张候选图，以四宫格的形式展示给你挑选。整个生成过程通过 SSE 实时推送进度，不用傻等，随时知道跑到哪一步了。选中满意的图片后，直接进入编辑器开始修图。
+### 创作与素材管理
 
-![](https://pic.yupi.icu/pine/image-20260901142856191.png)
+描述画面、选择比例和候选数量，也可以上传已有图片直接编辑。历史素材按会话收拢，候选图与后续产物保留在图片墙中。
 
+![创作工作台：画面描述、比例选择与会话素材卡片](assets/screenshots/create.png)
 
+### 对话与图层编辑
 
-2）专业级画布编辑器
+左侧描述修改要求，中间操作画布，右侧管理图层、变换和属性。支持主体与背景分离、局部选区、前后对比，以及收起面板后的大画布操作。
 
-基于 react-konva 搭建了一个真正能用的图片编辑器，支持画布缩放平移、图层文档管理、撤销重做，还有前后对比滑杆，一拖就能看到修图前后的效果。这不是玩具级 demo，而是对标专业修图软件的交互体验。
+![图片编辑器：对话计划、独立商品图层、工具栏与属性面板](assets/screenshots/editor.png)
 
-![](https://pic.yupi.icu/pine/image-20260831153713493.png)
+### 营销图与多尺寸交付
 
+从当前会话生成四类营销图，保留原画布；选择投放比例，将主体完整放入目标画幅，再统一选择和打包产物。
 
+![导出工作台：营销图生成、投放尺寸与图片打包](assets/screenshots/marketing.png)
 
-3）自然语言驱动修图
+### 批量流水线
 
-这是整个项目最酷的能力。你在对话框里输入一句话，比如“把背景换成海滩”、“提高亮度和饱和度”，AI Agent 会自动分析你的需求，规划出修图步骤，然后一步步调用工具帮你执行。不需要你去找按钮、调参数，说一句话就搞定。
+为多张图片配置同一套处理步骤，查看批次进度与逐项结果，并按所选格式导出。
 
-![](https://pic.yupi.icu/pine/image-20260831155606100.png)
+![批量工作台：素材选择、处理步骤与输出格式](assets/screenshots/batch.png)
 
+## 从创作到交付
 
+1. **开始创作**：描述需要的画面，或上传已有商品图。
+2. **进入会话**：选定候选图，在图片墙中保留其他方向。
+3. **精修画面**：使用对话或工具栏调整图层、颜色、背景与局部内容。
+4. **扩展物料**：生成营销图，或对多张素材应用同一套处理流程。
+5. **导出交付**：选择尺寸与产物，打包下载。
 
-4）21 种编辑工具，覆盖主流修图场景
+## 架构
 
-项目内置了丰富的编辑工具：rembg 一键抠图、11 参调色（亮度/对比度/饱和度/色温等）、裁剪/翻转/缩放/旋转/移动等画布变换、AI 换背景、AI 扩图、超分辨率放大。手动点击工具栏可以用，Agent 也能自动调用，UI 和 Agent 共享同一套工具注册表。
+前端使用 React、TypeScript 与 Konva 图层画布。后端由 FastAPI 提供业务接口，耗时操作通过 ARQ 异步任务队列交给独立 worker 进程执行；SSE（服务器发送事件）将任务进度推送回浏览器。
 
-![](https://pic.yupi.icu/pine/image-20260831160551720.png)
-
-
-
-5）智能区域选择
-
-集成了 SAM（Segment Anything Model）点选能力，鼠标点一下就能精准选中画面中的任意物体。还支持笔刷涂抹模式，自由绘制选区。首次点击计算 embedding，后续点击只跑 decoder，响应速度是毫秒级的。
-
-![](https://pic.yupi.icu/pine/Google%20Chrome%202026-08-31%2016.09.05.png)
-
-
-
-6）局部精细编辑
-
-有了选区之后，可以做局部消除和局部替换。局部消除会用 AI inpainting 把选区内的东西抹掉，自动填补背景；局部替换可以用一句提示词描述你想换成什么，只改选区内容，其他地方纹丝不动。
-
-![](https://pic.yupi.icu/pine/image-20260901141549744.png)
-
-
-
-7）图层拆分和独立操作
-
-一键把图片按语义拆成主体层和背景层，还可以选择拆出 OCR 文字层。拆完之后每个图层可以独立缩放、调色、移动，互不影响。还支持点选画面中的任意物体，把它提升为独立图层，背景自动修复。图层数据用 JSONB 持久化，切换图片再切回来，图层结构不会丢。
-
-![](https://pic.yupi.icu/pine/image-20260831161340074.png)
-
-
-
-8）多步计划和人机协作
-
-当修图需求比较复杂时，AI 会输出一份包含多个步骤的结构化 JSON 计划，每一步标注了依赖关系。服务端会做工具存在性校验、参数合法性检查、依赖补全和环检测，然后按拓扑排序确定执行顺序。用户可以在计划卡片上确认执行、单步重试或取消后续，真正做到人机协作，AI 干活你把关。
-
-![](https://pic.yupi.icu/pine/image-20260831161657975.png)
-
-
-
-## 二、项目收获
-
-本项目选题新颖，紧跟 AI Agent 和 AIGC 趋势，以 **专业级 AI 修图工具** 为目标。区别于增删改查的烂大街项目，你将从零搭建一个集画布编辑器、AI Agent、异步任务、图层系统于一体的全栈应用，技术深度和广度都远超普通项目。
-
-项目内容丰富扎实，前后端 + AI Agent 全链路覆盖，帮你成为 AI 时代企业的香饽饽，给你的简历和求职大幅增加竞争力！
-
-Python 全栈 + LangChain / LangGraph Agent + 专业画布编辑器 + 异步任务 + 图层系统，技术丰富，玩透 AI Agent 全栈项目开发~
-
-![](https://pic.yupi.icu/pine/exec-78d8e822-f4ff-4152-9e72-0580bd4041ba.png)
-
-本项目给大家讲的是 **通用的 AI Agent 开发方法和真实工具产品从 0 到部署的全流程**，从这个项目中你可以学到：
-
-+ 如何基于 FastAPI + SQLAlchemy 搭建 Python 全栈项目，实现 JWT Cookie 认证？
-+ 如何设计 Provider 抽象层，一行配置切换 Mock 和真实 AI 模型？
-+ 如何用 ARQ 异步队列 + Redis Pub/Sub + SSE 实现实时进度推送？
-+ 如何用 react-konva 搭建专业级图片编辑器，支持图层文档和视口变换？
-+ 如何用 LangChain 接入规划模型，再用 LangGraph 构建 AI Agent，让大模型规划修图步骤？
-+ 如何设计统一的工具注册表，一处定义同时服务 UI 和 Agent？
-+ 如何用 SAM 模型实现智能点选，一键选中任意物体？
-+ 如何做图层拆分，把一张图拆成主体、背景和文字三个独立图层？
-+ 如何实现多步计划的服务端校验、拓扑排序和人机协作？
-+ 如何用 Docker 多阶段构建和 compose profile 实现一条命令部署？
-
-### 编程导航系列项目优势
-
-此外，还能学会很多架构设计、方案取舍、问题排查的方法，提升独立解决复杂问题的能力。本项目还给大家提供了大量的项目扩展点，有能力的同学可以进一步拉开和别人的区分度，无限进步！
-
-满满的项目正反馈：
-
-![编程导航 26 年报喜](https://pic.yupi.icu/1/%E7%BC%96%E7%A8%8B%E5%AF%BC%E8%88%AA%2026%20%E5%B9%B4%E6%8A%A5%E5%96%9C%E6%88%AA%E5%9B%BE.png)
-
-除视频教程外，编程导航的项目还提供：
-
-| 教程资料                     | 求职助力                       |
-| ---------------------------- | ------------------------------ |
-| 详细的文字教程 / 直播笔记    | ⭐️ 现成的简历写法，直接写满简历 |
-| 完整的项目源码               | ⭐️ 项目相关面试题解和真实面经   |
-| 1 对 1 答疑解惑 + 专属交流群 | ⭐️ 项目扩展思路，拉开区分度     |
-| 前端 + Java 后端万用项目模板 | ⭐️ 从学项目到拿 Offer 一条龙    |
-
-![](https://pic.yupi.icu/1/%E9%B1%BC%E7%9A%AE%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98%E7%9A%84%E4%BC%98%E5%8A%BF%E5%A4%A7.jpeg)
-
-## 三、更多介绍
-
-该项目功能完整，涵盖文生图、画布编辑器、AI Agent 对话、编辑工具、区域选择、局部编辑、图层系统、多步计划、营销图、批量处理 10 大模块，覆盖了一个真实 AI 修图产品的核心业务场景。
-
-![](https://pic.yupi.icu/pine/feature-modules.png)
-
-本项目采用前后端分离 + 异步 Worker 架构。前端是 React 19 + Konva 的单页应用，后端是 Python FastAPI 服务，通过 REST API 和 SSE 通信。
-
-后端内部按照路由层、业务服务层、数据访问层分层，AI 生图、抠图、扩图等耗时任务通过 ARQ 异步队列提交到独立 Worker 执行，结果通过 Redis Pub/Sub + SSE 实时推送给前端。LangChain 负责接入规划模型和绑定工具签名，LangGraph 负责 Agent 的计划编排，ToolRegistry 统一管理所有编辑工具的元信息和执行逻辑。数据分别落在 PostgreSQL（业务数据）、Redis（缓存和消息）和 MinIO（图片资源）中。
-
-![](https://pic.yupi.icu/pine/system-architecture.png)
-
-项目的核心业务流程非常清晰，能够帮你理清 AI Agent 项目开发的思路，比如一次 AI 修图请求的完整链路：用户输入自然语言指令 → Agent 规划修图步骤 → 服务端校验和拓扑排序 → 用户确认计划 → 按依赖自动执行工具 → 结果推送前端 → 画布实时更新。
-
-![](https://pic.yupi.icu/pine/business-flow.png)
-
-## 四、快速运行
-
-> 完整的保姆级步骤请参考[《保姆级本地运行指南》](https://www.codefather.cn/course/2099386518517915649/section/2099389234463973378)
-
-### 前置条件
-
-- Docker >= 20（含 Compose）
-- Python >= 3.13
-- Node.js >= 18（推荐 20+）
-- 一个 [阿里云百炼 API Key](https://bailian.console.aliyun.com/)（🔧 可选，用于 AI 文生图、图像编辑和 Agent 对话）
-
-### 1. 克隆项目
-
-```bash
-git clone https://github.com/yuyuanweb/ai-retouch-agent.git
-cd ai-retouch-agent
+```mermaid
+flowchart LR
+    UI["React 工作台 / Konva 画布"] --> API["FastAPI 业务接口"]
+    API --> Agent["LangGraph 规划与校验"]
+    Agent --> Planner["规划模型 / 视觉理解"]
+    Agent --> Tools["统一工具注册表"]
+    API --> Tools
+    Tools --> Queue["Redis / ARQ 队列"]
+    Queue --> Worker["后台 worker"]
+    Worker --> Local["本地图像处理与分割"]
+    Worker --> Images["图片生成与编辑模型"]
+    API --> DB["PostgreSQL"]
+    Worker --> DB
+    API --> Storage["MinIO / S3 对象存储"]
+    Worker --> Storage
+    Worker --> Events["Redis 发布订阅 / SSE"]
+    Events --> UI
 ```
 
-### 2. 启动中间件
+| 层级 | 实现 |
+| --- | --- |
+| 前端 | React 19、TypeScript、Vite、Tailwind CSS、React Query、Zustand、react-konva |
+| 后端 | Python 3.13、FastAPI、Pydantic、SQLAlchemy、Alembic |
+| 智能体 | LangChain 绑定工具签名，LangGraph 编排规划与校验 |
+| 异步执行 | ARQ、Redis、独立 worker、任务进度推送 |
+| 图像处理 | Pillow、OpenCV、ONNX Runtime、U²-Net、SAM、RapidOCR |
+| 数据与文件 | PostgreSQL 保存业务与图层文档；MinIO 或兼容 S3 的存储保存图片与遮罩 |
+| 部署 | Docker 多阶段构建、Docker Compose、前后端同源托管 |
+
+### 智能体执行
+
+- 规划输入包含用户要求、图层与选区摘要；DeepSeek 规划路径还会附上当前图层合成的画布预览。
+- 模型输出工具名称与参数，后端校验工具是否存在、参数是否合法、依赖是否有效。
+- 每轮计划最多 8 步。多步计划支持确认、取消和失败步骤重试，执行状态保存到数据库。
+- 图像、图层与选区分别管理：工具可以只作用于某个图层，或进一步限定到该层内的选区。
+- DeepSeek 负责理解画面和规划操作；实际图片生成、重绘由图片模型执行，本地操作由对应图像处理模块完成。
+
+### 图片与会话
+
+图片、透明图层和遮罩以独立对象保存，数据库记录素材归属、尺寸、格式和存储位置。浏览器通过短时签名地址读取图片，不接触对象存储密钥。
+
+图层文档保存到 PostgreSQL 的 JSONB 字段中。任务队列主要传递执行记录编号，worker 按需读取图片，完成后保存产物、更新编辑状态并发布进度。重连进度流时会先返回当前状态快照。
+
+## 运行配置
+
+### 环境
+
+- Python 3.13 或更新版本、uv。
+- Node.js 22.12 或更新版本、npm。
+- PostgreSQL 17、Redis 7，以及 MinIO 或兼容 S3 的对象存储。
+- 本地视觉能力对应的模型权重；图片生成与视觉规划对应的服务凭据。
+
+### 应用配置
 
 ```bash
-docker compose up -d
+git clone https://github.com/ReRuol/picture-editor.git
+cd picture-editor
+cp .env.example .env
 ```
 
-### 3. 启动后端
+`.env` 位于仓库根目录。按部署环境填写数据库、Redis、对象存储和模型配置。图片模型与规划模型独立选择，例如：
+
+```dotenv
+IMAGE_PROVIDER=volcengine
+VOLCENGINE_API_KEY=your-image-provider-key
+VOLCENGINE_IMAGE_MODEL=your-model-or-endpoint-id
+
+PLANNER_PROVIDER=deepseek
+DEEPSEEK_API_KEY=your-planner-key
+DEEPSEEK_PLANNER_MODEL=deepseek-flash
+```
+
+| 配置 | 用途 |
+| --- | --- |
+| `IMAGE_PROVIDER` | 图片生成与编辑，支持 `volcengine`、`dashscope` |
+| `PLANNER_PROVIDER` | 指令规划，支持 `deepseek`、`volcengine`、`dashscope` |
+| `DATABASE_URL`、`REDIS_URL` | 业务数据库与任务队列连接 |
+| `S3_ENDPOINT`、`S3_BUCKET` | 对象存储内部地址与存储桶 |
+| `S3_PUBLIC_ENDPOINT` | 浏览器能够访问的对象存储入口 |
+| `JWT_SECRET` | 登录会话签名密钥 |
+| `REGISTRATION_ENABLED`、`ALLOWED_USERNAME` | 后端注册与账号访问策略 |
+| `MATTING_PROVIDER`、`OCR_PROVIDER` | 本地抠图与文字识别策略 |
+
+视觉规划使用支持图片输入的模型；其他规划服务需按所选模型能力配置。生成和编辑的费用取决于所选模型服务与调用配置。
+
+登录入口使用邮箱，当前界面不提供公开注册入口。部署前需预置可用账号；`ALLOWED_USERNAME` 限定已有账号，不会自动创建账号。请使用自己的账号与凭据，仓库不提供公共登录密码。
+
+### 本地视觉模型
+
+去背景使用本地 U²-Net 权重，通过 ONNX Runtime 在 CPU 上推理；模型会话复用，并限制推理线程和内存分配策略。worker 启动时检查权重文件，用户操作期间不会临时下载抠图权重。
+
+默认可将 `u2net.onnx` 放在 `~/.u2net/`；也可以通过 `U2NET_HOME` 指定模型目录，在其根目录放置该文件。点选分割使用 SAM，文字识别使用 RapidOCR，启用相应能力时需准备对应依赖与权重。
+
+### 启动服务
+
+先准备好 `.env` 中配置的 PostgreSQL、Redis 和对象存储，再启动应用。仓库的 `docker-compose.yml` 包含基础服务与应用部署配置，镜像版本、端口和数据卷需与实际环境匹配。
 
 ```bash
 cd backend
-
-# 安装 uv（已有可跳过）
-curl -LsSf https://astral.sh/uv/install.sh | sh   # Windows: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# 安装依赖（国内可加 --index-url https://pypi.tuna.tsinghua.edu.cn/simple）
-uv sync --all-extras
-
-# 配置环境变量
-cp .env.example .env                  # 至少确认 IMAGE_PROVIDER，mock 免费跑通全流程，dashscope 接真实模型
-
-# 初始化数据库
+uv sync --all-extras --no-dev
 uv run alembic upgrade head
+uv run uvicorn app.main:app --host 0.0.0.0 --port 7302
+```
 
-# 启动 API 服务（终端一）
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 7302
+在另一个终端启动后台进程：
 
-# 启动 Worker（新开终端二）
+```bash
+cd backend
 uv run arq app.worker.WorkerSettings
 ```
 
-启动成功后访问 [http://localhost:7302/api/health](http://localhost:7302/api/health)，三个字段全是 `ok` 即为正常。
-
-### 4. 启动前端
-
-**新开一个终端**：
+启动前端：
 
 ```bash
 cd frontend
-npm install                           # 国内可加 --registry=https://registry.npmmirror.com
+npm ci
 npm run dev
 ```
 
-浏览器打开 [http://localhost:7301](http://localhost:7301) 即可使用。
+访问 `http://localhost:7301`。后端接口文档位于 `http://localhost:7302/api/docs`，健康状态位于 `/api/health`。
 
-### 5. 运行测试
+### 容器部署
 
-```bash
-cd backend
-uv run pytest
+`Dockerfile` 会编译前端并将产物放入后端镜像，由应用同源提供页面和接口。`docker-compose.yml` 的 `deploy` 配置组包含应用与 worker，两者使用同一份模型、数据库及对象存储配置。
+
+部署时为数据库、Redis、对象存储和本地模型设置持久化数据卷，并配置外部访问域名、HTTPS、随机会话签名密钥和账号策略。容器内的对象存储地址与浏览器的公开访问地址通过不同配置项分别指定。
+
+## 项目结构
+
+```text
+picture-editor/
+├── frontend/src/
+│   ├── pages/             创作、编辑、批量、导出页面
+│   ├── components/        画布、图层面板、对话与工具界面
+│   ├── hooks/             会话、素材与任务状态
+│   └── stores/            编辑交互与视口状态
+├── backend/app/
+│   ├── agent/             规划、工具计划与画布视觉输入
+│   ├── tools/             统一工具定义与执行逻辑
+│   ├── providers/         图片模型服务适配
+│   ├── edits/             像素处理、分割与本地推理
+│   ├── services/          会话、素材、任务与业务逻辑
+│   ├── routers/           业务接口与进度流
+│   └── models/            数据模型
+├── assets/screenshots/    当前界面截图
+├── Dockerfile
+└── docker-compose.yml
 ```
 
-测试通过 mock 隔离了大模型和第三方接口调用，不消耗 API 额度。
+## 参与贡献
 
-### 6. 部署
-
-`Dockerfile` 提供了多阶段构建，前端编译后打进后端镜像同源托管。服务器上安全组放开 7302、7313 端口，然后：
-
-```bash
-cp .env.example .env
-# 生产环境必改：JWT_SECRET（openssl rand -hex 32）、S3_PUBLIC_ENDPOINT=http://你的公网IP:7313
-
-docker compose --profile deploy up -d --build
-docker compose --profile deploy exec app alembic upgrade head
-```
-
-浏览器打开 `http://你的公网IP:7302`。
-
-
-## 加入项目学习
-
-编程导航已有 **近 30 套项目教程！** 每个项目的学习重点不同，从 0 到 1 带做，有大量完整的 **AI 应用开发 + AI 编程 + 全栈项目**，零基础也能学！
-
-详细请见：[https://codefather.cn/course](https://www.codefather.cn/course)（在该页面右侧有教程推荐和学习建议）
-
-![](https://pic.yupi.icu/1/%E9%A1%B9%E7%9B%AE%E6%95%99%E7%A8%8B.png)
-
-欢迎加入 [编程导航](https://www.codefather.cn/vip)，加入后不仅可以全程跟学本项目，往期 **近 30 套原创项目教程** 也都可以无限回看。还能享受更多原创技术资料、学习和求职指导、上百场面试回放视频，开启你的编程起飞之旅~
-
-🧧 助力新项目学习，给大家发放 **限时编程导航优惠券**，扫码即可领券加入。加入三天内不满意可全额退款，欢迎加入体验，名额有限，速来学习！
-
-![](https://pic.yupi.icu/1/437345684-56411098-b60e-4267-8ba2-4ebc5d416afc.png)
-
-1 天不到 1 块钱，绝对是对自己最值的投资！成为编程导航会员后，可以解锁近 30 套项目的教程和资料，PC 网站和 APP 都可以学习，如图：
-
-![](https://pic.yupi.icu/1/image-20250120113756426-20250422160856746.png)
+欢迎提交问题反馈、交互改进和模型适配。问题反馈请附操作步骤、预期行为与相关日志，并移除个人素材、登录凭据及模型密钥。
